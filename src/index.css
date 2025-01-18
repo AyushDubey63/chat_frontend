@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+/* Hide scrollbars in all browsers */
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
