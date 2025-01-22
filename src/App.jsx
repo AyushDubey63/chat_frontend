@@ -9,17 +9,23 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 
 const queryClient = new QueryClient();
+
 function App() {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <SocketProvider>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/sign-up" element={<SignUpPage />} />
-          </Routes>
-        </SocketProvider>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <SocketProvider>
+                <HomePage />
+              </SocketProvider>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
+        </Routes>
       </QueryClientProvider>
     </BrowserRouter>
   );

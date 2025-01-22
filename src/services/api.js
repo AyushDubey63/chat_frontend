@@ -4,6 +4,17 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const registerUserMutation = async (data) =>
   await axios.post(`${BASE_URL}/user/register-user`, data);
 
+const fetchUserAllChats = async () =>
+  await axios.get(`${BASE_URL}/chat/get-all-chats`, {
+    withCredentials: true,
+  });
+const fetchChatsByChatId = async ({ chat_id, page, limit = 10 }) =>
+  await axios.get(
+    `${BASE_URL}/chat/get-chats?chat_id=${chat_id}&page=${page}&limit=${limit}`,
+    {
+      withCredentials: true,
+    }
+  );
 const loginUserMutation = async (formData) => {
   const response = await fetch(`${BASE_URL}/user/login-user`, {
     method: "POST",
@@ -22,4 +33,9 @@ const loginUserMutation = async (formData) => {
   return response; // Return the entire response object
 };
 
-export { registerUserMutation, loginUserMutation };
+export {
+  registerUserMutation,
+  loginUserMutation,
+  fetchUserAllChats,
+  fetchChatsByChatId,
+};
