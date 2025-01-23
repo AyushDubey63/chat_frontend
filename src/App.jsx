@@ -7,6 +7,7 @@ import { SocketProvider } from "./context/socket";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
+import ProtectedRoute from "./wrappers/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,10 @@ function App() {
             path="/"
             element={
               <SocketProvider>
-                <HomePage />
+                <ProtectedRoute>
+                  {" "}
+                  <HomePage />{" "}
+                </ProtectedRoute>
               </SocketProvider>
             }
           />

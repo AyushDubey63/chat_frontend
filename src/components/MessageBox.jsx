@@ -1,18 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import chat_bg from "../assets/chat_bg.jpg";
 import { useSocket } from "../context/socket";
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchChatsByChatId } from "../services/api";
-import { useInView } from "react-intersection-observer";
+
 function MessageBox({ user }) {
-  const { ref, inView } = useInView();
-  const scrollMessageRef = useRef(null);
+  const scrollContainerRef = useRef(null); // Ref for the scroll container
+  const scrollMessageRef = useRef(null); // Ref for auto-scroll to the bottom
   const [message, setMessage] = React.useState("");
   const queryClient = useQueryClient();
+
   const { data, isLoading, isError, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["messages", user.chat_id],
@@ -35,25 +32,36 @@ function MessageBox({ user }) {
     setMessage("");
     queryClient.invalidateQueries(["messages", user.chat_id]);
   };
+
   useEffect(() => {
     socket.on("message_event", (data) => {
       queryClient.invalidateQueries(["messages", user.chat_id]);
     });
-  }, [socket]);
+
+    return () => {
+      socket.off("message_event");
+    };
+  }, [socket, queryClient, user.chat_id]);
+
   useEffect(() => {
     if (scrollMessageRef.current) {
       scrollMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [data]);
-  useEffect(() => {
-    console.log("inView");
-    if (inView && !isFetchingNextPage) {
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current || isFetchingNextPage) return;
+
+    const { scrollTop } = scrollContainerRef.current;
+    if (scrollTop === 0) {
+      // Trigger API call when scrolled to the top
       fetchNextPage();
     }
-  }, [inView, isFetchingNextPage]);
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching messages.</div>;
-  console.log(data.pages[0], 52);
+
   return (
     <div
       style={{
@@ -61,34 +69,42 @@ function MessageBox({ user }) {
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
-      className="h-full w-full "
+      className="h-full w-full"
     >
-      <div className="max-h-[90%] overflow-y-scroll scrollbar-hidden">
-        <div ref={ref}></div>
-        {data &&
-          data?.pages[0]?.data?.data?.messages?.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex p-2 ${
-                parseInt(msg.sender_id) === parseInt(user.user_id)
-                  ? "justify-end"
-                  : "justify-start"
-              }`}
-            >
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll} // Attach scroll handler
+        className="max-h-[90%] overflow-y-scroll scrollbar-hidden"
+      >
+        {data?.pages
+          ?.slice()
+          .reverse() // Reverse the pages to maintain correct order
+          .map((page) =>
+            page.data.data.messages.map((msg) => (
               <div
-                className={`p-2 rounded-lg ${
-                  msg.sender_id === user.id
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-300"
+                key={msg.id}
+                className={`flex p-2 ${
+                  parseInt(msg.sender_id) === parseInt(user.user_id)
+                    ? "justify-start"
+                    : "justify-end"
                 }`}
               >
-                <p>{msg.message}</p>
-                <p className="text-xs text-gray-500">
-                  {new Date(msg.created_at).toLocaleString()}
-                </p>
+                <div
+                  className={`p-2 rounded-lg ${
+                    parseInt(msg.sender_id) === parseInt(user.user_id)
+                      ? "bg-gray-300"
+                      : "bg-blue-500 text-white"
+                  }`}
+                >
+                  <p>{msg.message}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(msg.created_at).toLocaleString()}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
+        {isFetchingNextPage && <div>Loading older messages...</div>}
         <div ref={scrollMessageRef}></div>
       </div>
       <div className="border-2 h-[10%] w-full bg-gray-200 flex justify-between items-center p-2">

@@ -1,20 +1,23 @@
 import React from "react";
 import { IoIosSearch } from "react-icons/io";
-import { useQuery } from "@tanstack/react-query";
-import { fetchUserAllChats } from "../services/api";
-
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchUserAllChats, logoutUser } from "../services/api";
+import { GrLogout } from "react-icons/gr";
 function LeftSideBar({ setUser }) {
-  const { data, isError, isLoading, isFetched } = useQuery({
+  const queryClient = useQueryClient();
+  const { data, isError, isLoading } = useQuery({
     queryKey: ["freinds"],
     queryFn: fetchUserAllChats,
   });
   const userData = data?.data?.data || {};
-  // Use a fallback value in case `data` or `contacts` is undefined
   const contacts = data?.data?.data?.chats || [];
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching data</div>;
-
+  const handleLogoutUser = async () => {
+    await logoutUser();
+    queryClient.invalidateQueries("auth");
+  };
   return (
     <div className="max-h-screen h-full w-full">
       <div className=" bg-gray-300">
@@ -29,6 +32,7 @@ function LeftSideBar({ setUser }) {
           <h2 className="text-center text-lg font-semibold">
             {userData.user_name}
           </h2>
+          <GrLogout size={20} onClick={handleLogoutUser} />
         </div>
         <div className="border p-2 border-black flex gap-2 items-center">
           <input

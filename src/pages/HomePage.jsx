@@ -6,11 +6,11 @@ function HomePage() {
   const [user, setUser] = React.useState(null);
   // const set
   return (
-    <div className="grid max-h-screen overflow-hidden h-screen w-full grid-cols-6">
-      <div className="scrollbar-hidden col-span-1 bg-white ">
+    <div className="grid max-h-screen overflow-hidden h-screen w-full grid-cols-9">
+      <div className="scrollbar-hidden col-span-2 bg-white ">
         <LeftSideBar setUser={setUser} />
       </div>
-      <div className="col-span-5 ">
+      <div className="col-span-7 ">
         {user ? (
           <Chat user={user} />
         ) : (

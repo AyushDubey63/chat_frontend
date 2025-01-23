@@ -2,7 +2,7 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const registerUserMutation = async (data) =>
-  await axios.post(`${BASE_URL}/user/register-user`, data);
+  await axios.post(`${BASE_URL}/auth/register-user`, data);
 
 const fetchUserAllChats = async () =>
   await axios.get(`${BASE_URL}/chat/get-all-chats`, {
@@ -16,7 +16,7 @@ const fetchChatsByChatId = async ({ chat_id, page, limit = 10 }) =>
     }
   );
 const loginUserMutation = async (formData) => {
-  const response = await fetch(`${BASE_URL}/user/login-user`, {
+  const response = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     credentials: "include", // Ensures cookies are sent with the request
     headers: {
@@ -32,10 +32,28 @@ const loginUserMutation = async (formData) => {
   console.log(response.headers, 21);
   return response; // Return the entire response object
 };
+const authenticateUser = async () =>
+  await axios.post(
+    `${BASE_URL}/auth/authenticate`,
+    {},
+    {
+      withCredentials: true,
+    }
+  );
 
+const logoutUser = async () =>
+  await axios.post(
+    `${BASE_URL}/auth/logout`,
+    {},
+    {
+      withCredentials: true,
+    }
+  );
 export {
   registerUserMutation,
   loginUserMutation,
+  logoutUser,
   fetchUserAllChats,
   fetchChatsByChatId,
+  authenticateUser,
 };
