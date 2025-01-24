@@ -3,7 +3,7 @@ import ReceiversName from "./ReceiversName";
 import MessageBox from "./MessageBox";
 
 function Chat({ user }) {
-  console.log(user, 6);
+  const [status, setStatus] = React.useState("offline");
   return (
     <div className="h-screen w-full bg-gray-300">
       {" "}
@@ -11,11 +11,11 @@ function Chat({ user }) {
       <div className="h-[10vh]">
         {" "}
         {/* Adjust to 10% of the viewport height */}
-        <ReceiversName name={user.user_name} />
+        <ReceiversName name={user.user_name} status={status} />
       </div>
       <div className="w-full h-[90vh] flex flex-col ">
         {" "}
-        <MessageBox user={user} />
+        <MessageBox user={user} setStatus={setStatus} />
       </div>
     </div>
   );

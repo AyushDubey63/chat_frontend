@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import ProtectedRoute from "./wrappers/ProtectedRoute";
+import NotificationBox from "./components/NotificationBox";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
+          {/* <Route path="/notifications" element={<NotificationBox />} /> */}
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

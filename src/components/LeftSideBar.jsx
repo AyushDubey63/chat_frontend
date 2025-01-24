@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
+import { IoNotificationsOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchUserAllChats, logoutUser } from "../services/api";
 import { GrLogout } from "react-icons/gr";
+import NotificationBox from "./NotificationBox";
 function LeftSideBar({ setUser }) {
+  const [openNotification, setOpenNotification] = useState(false);
   const queryClient = useQueryClient();
   const { data, isError, isLoading } = useQuery({
     queryKey: ["freinds"],
@@ -35,6 +38,13 @@ function LeftSideBar({ setUser }) {
           <GrLogout size={20} onClick={handleLogoutUser} />
         </div>
         <div className="border p-2 border-black flex gap-2 items-center">
+          <IoNotificationsOutline
+            onClick={() => {
+              setOpenNotification((prev) => !prev);
+              console.log(openNotification);
+            }}
+            size={30}
+          />
           <input
             type="text"
             className="w-full outline-none p-2 bg-white rounded-xl"
@@ -45,7 +55,9 @@ function LeftSideBar({ setUser }) {
         </div>
       </div>
       <ul className="max-h-[84%] overflow-y-scroll scrollbar-hidden">
-        {contacts.length > 0 ? (
+        {openNotification ? (
+          <NotificationBox setOpenNotification={setOpenNotification} />
+        ) : contacts.length > 0 ? (
           contacts.map((contact) => (
             <li
               onClick={() => setUser(contact)}
