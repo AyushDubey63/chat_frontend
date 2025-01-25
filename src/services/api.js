@@ -49,6 +49,10 @@ const logoutUser = async () =>
       withCredentials: true,
     }
   );
+const searchNewContact = async ({ searchTerm }) =>
+  await axios.get(`${BASE_URL}/user/search-users?search=${searchTerm}`, {
+    withCredentials: true,
+  });
 export {
   registerUserMutation,
   loginUserMutation,
@@ -56,4 +60,5 @@ export {
   fetchUserAllChats,
   fetchChatsByChatId,
   authenticateUser,
+  searchNewContact,
 };

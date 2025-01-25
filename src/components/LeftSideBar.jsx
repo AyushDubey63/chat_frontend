@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchUserAllChats, logoutUser } from "../services/api";
-import { GrLogout } from "react-icons/gr";
 import NotificationBox from "./NotificationBox";
+import FloatingActionButton from "../ui/FloatingActionButton";
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
-  const queryClient = useQueryClient();
   const { data, isError, isLoading } = useQuery({
     queryKey: ["freinds"],
     queryFn: fetchUserAllChats,
@@ -17,12 +16,9 @@ function LeftSideBar({ setUser }) {
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching data</div>;
-  const handleLogoutUser = async () => {
-    await logoutUser();
-    queryClient.invalidateQueries("auth");
-  };
+
   return (
-    <div className="max-h-screen h-full w-full">
+    <div className="max-h-screen h-full w-full relative">
       <div className=" bg-gray-300">
         <div className=" justify-start p-2 flex  items-center gap-2">
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
@@ -35,16 +31,8 @@ function LeftSideBar({ setUser }) {
           <h2 className="text-center text-lg font-semibold">
             {userData.user_name}
           </h2>
-          <GrLogout size={20} onClick={handleLogoutUser} />
         </div>
         <div className="border p-2 border-black flex gap-2 items-center">
-          <IoNotificationsOutline
-            onClick={() => {
-              setOpenNotification((prev) => !prev);
-              console.log(openNotification);
-            }}
-            size={30}
-          />
           <input
             type="text"
             className="w-full outline-none p-2 bg-white rounded-xl"
@@ -78,6 +66,7 @@ function LeftSideBar({ setUser }) {
           <div>No contacts available</div>
         )}
       </ul>
+      <FloatingActionButton setOpenNotification={setOpenNotification} />
     </div>
   );
 }
