@@ -7,11 +7,12 @@ import { searchNewContact } from "../services/api";
 import Modal from "../ui/Modal";
 import Loader from "../ui/Loader";
 import useDebounce from "../utils/useDebounce";
+import { useSocket } from "../context/socket";
 
 function SearchNewUser({ open, setOpen }) {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { debouncedValue } = useDebounce(searchTerm, 500);
-
+  const socket = useSocket();
   const { data, isError, isLoading } = useQuery({
     queryKey: ["search", debouncedValue],
     queryFn: () => searchNewContact({ searchTerm: debouncedValue }),
@@ -37,7 +38,12 @@ function SearchNewUser({ open, setOpen }) {
       </Modal>
     );
   }
-
+  const handleSendRequest = (userId) => {
+    socket.emit("notification", {
+      receiver_id: userId,
+      type: "chat_request",
+    });
+  };
   return (
     <div>
       <Modal isOpen={open} onClose={() => setOpen(false)}>
@@ -57,22 +63,27 @@ function SearchNewUser({ open, setOpen }) {
               data.data.data.map((contact) => (
                 <div
                   key={contact.user_id}
-                  className="flex items-center space-x-4 p-3 border-b border-gray-300 hover:bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between space-x-4 p-3 border-b border-gray-300 hover:bg-gray-50 rounded-lg"
                 >
-                  {contact.profile_pic ? (
-                    <img
-                      src={contact.profile_pic}
-                      alt={contact.user_name}
-                      className="h-12 w-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <CgProfile size={50} />
-                  )}
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    {contact.user_name}
-                  </h3>
+                  <div className="flex items-center gap-4">
+                    {contact.profile_pic ? (
+                      <img
+                        src={contact.profile_pic}
+                        alt={contact.user_name}
+                        className="h-12 w-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <CgProfile size={50} />
+                    )}
+                    <h3 className="text-base font-semibold text-gray-700">
+                      <b> {contact.user_name}</b>
+                    </h3>
+                  </div>
                   <button title="send chat request ">
-                    <BsSendPlusFill size={25} />
+                    <BsSendPlusFill
+                      onClick={() => handleSendRequest(contact.user_id)}
+                      size={25}
+                    />
                   </button>
                 </div>
               ))

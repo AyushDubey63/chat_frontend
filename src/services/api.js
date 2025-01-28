@@ -53,6 +53,21 @@ const searchNewContact = async ({ searchTerm }) =>
   await axios.get(`${BASE_URL}/user/search-users?search=${searchTerm}`, {
     withCredentials: true,
   });
+const fetchNotifications = async () =>
+  await axios.get(`${BASE_URL}/notification/get-all-notifications`, {
+    withCredentials: true,
+  });
+
+const fetchChatRequests = async () =>
+  await axios.get(`${BASE_URL}/request/get-connection-requests-received`, {
+    withCredentials: true,
+  });
+
+const fetchRequestsSent = async () =>
+  await axios.get(`${BASE_URL}/request/get-connection-requests-sent`, {
+    withCredentials: true,
+  });
+
 export {
   registerUserMutation,
   loginUserMutation,
@@ -61,4 +76,7 @@ export {
   fetchChatsByChatId,
   authenticateUser,
   searchNewContact,
+  fetchNotifications,
+  fetchChatRequests,
+  fetchRequestsSent,
 };
