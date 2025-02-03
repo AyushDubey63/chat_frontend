@@ -1,7 +1,23 @@
+import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { useSocket } from "../context/socket";
 
 function ChatRequestsTab({ chatRequests }) {
-  console.log(chatRequests, 4);
+  // console.log(chatRequests, 4);
+  const queryClient = useQueryClient();
+  const socket = useSocket();
+
+  const handleAccept = (request) => {
+    socket.emit("notification", {
+      receiver_id: id,
+      type: "chat_accept",
+      message_data: {
+        status: "accepted",
+        message: "Chat request accepted",
+        request_id: id,
+      },
+    });
+  };
   return (
     <>
       {chatRequests.length === 0 ? (
@@ -25,7 +41,10 @@ function ChatRequestsTab({ chatRequests }) {
               </span>
             </div>
             <div className="flex gap-2">
-              <button className="bg-green-500 text-white p-2 rounded-full">
+              <button
+                onClick={() => handleAccept(request)}
+                className="bg-green-500 text-white p-2 rounded-full"
+              >
                 start chatting
               </button>
               <button className="bg-red-500 text-white p-2 rounded-full">

@@ -8,6 +8,7 @@ import Modal from "../ui/Modal";
 import Loader from "../ui/Loader";
 import useDebounce from "../utils/useDebounce";
 import { useSocket } from "../context/socket";
+import toast from "react-hot-toast";
 
 function SearchNewUser({ open, setOpen }) {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -42,7 +43,12 @@ function SearchNewUser({ open, setOpen }) {
     socket.emit("notification", {
       receiver_id: userId,
       type: "chat_request",
+      message_data: {
+        status: "pending",
+        message: "You have a new chat request",
+      },
     });
+    toast.success("Chat request sent successfully");
   };
   return (
     <div>

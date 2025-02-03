@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchUserAllChats, logoutUser } from "../services/api";
 import NotificationBox from "./NotificationBox";
 import FloatingActionButton from "../ui/FloatingActionButton";
+
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
   const { data, isError, isLoading } = useQuery({
