@@ -13,12 +13,14 @@ function NotificationsTab() {
     queryFn: fetchNotifications,
   });
 
-  if (isLoading) return <Loader status="loading" />;
-  if (isError) return <div>Error fetching data</div>;
+  // Always call hooks unconditionally
   const socket = useSocket();
 
+  // Log the socket to debug potential re-renders
   useEffect(() => {
-    socket.on("notification", (data) => {
+    console.log("Socket inside useEffect:", socket);
+
+    const handleNotification = (data) => {
       console.log(data, 27);
       if (data.type === "chat_request") {
         toast.success("You have a new chat request");
@@ -29,8 +31,20 @@ function NotificationsTab() {
       queryClient.invalidateQueries({
         queryKey: ["notifications", "chatRequests", "requestsSent"],
       });
-    });
-  }, [socket]);
+    };
+
+    // Add event listener
+    socket.on("notification", handleNotification);
+
+    // Cleanup listener on component unmount or socket change
+    return () => {
+      socket.off("notification", handleNotification);
+    };
+  }, [socket, queryClient]);
+
+  if (isLoading) return <Loader status="loading" />;
+  if (isError) return <div>Error fetching data</div>;
+
   return (
     <>
       {data.data.data.notifications.length === 0 ? (

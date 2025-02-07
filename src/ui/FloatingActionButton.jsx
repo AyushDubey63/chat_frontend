@@ -30,7 +30,7 @@ function FloatingActionButton({ setOpenNotification }) {
       <div id="button-container">
         <button className="button faq-button" id="dribbble">
           <FiPlus onClick={() => setSearchBox(true)} size={25} />
-          <span class="tooltip text-xs text-nowrap">New Contact</span>
+          <span className="tooltip text-xs text-nowrap">New Contact</span>
         </button>
         <button
           onClick={() => setOpenNotification((prev) => !prev)}
@@ -38,7 +38,7 @@ function FloatingActionButton({ setOpenNotification }) {
           id="instagram"
         >
           <IoNotificationsOutline size={25} />
-          <span class="tooltip text-xs">Notifications</span>
+          <span className="tooltip text-xs">Notifications</span>
         </button>
         <button
           onClick={() => setOpenLogout(true)}
@@ -46,7 +46,7 @@ function FloatingActionButton({ setOpenNotification }) {
           id="logout"
         >
           <RxExit size={25} />
-          <span class="tooltip text-xs">Logout</span>
+          <span className="tooltip text-xs">Logout</span>
         </button>
         <button className="button shadow-md" id="share">
           <AiOutlineAppstore size={25} />

@@ -1,13 +1,23 @@
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
+import { fetchRequestsSent } from "../services/api";
 
-function RequestSentTab({ requestsSent }) {
-  console.log(requestsSent, 3);
+function RequestSentTab() {
+  const {
+    data,
+    isError: requestsSentError,
+    isLoading: requestsSentLoading,
+  } = useQuery({
+    queryKey: ["requestsSent"],
+    queryFn: fetchRequestsSent,
+    staleTime: 1000 * 60 * 1,
+  });
   return (
     <>
-      {requestsSent.length === 0 ? (
+      {data?.data?.data?.connection_requests.length === 0 ? (
         <div className="text-center w-full">No Requests Sent</div>
       ) : (
-        requestsSent.map((request) => (
+        data?.data?.data?.connection_requests.map((request) => (
           <div
             key={request.id}
             className="flex flex-col items-center gap-4 w-full"

@@ -1,29 +1,40 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useSocket } from "../context/socket";
+import { fetchChatRequests } from "../services/api";
 
-function ChatRequestsTab({ chatRequests }) {
+function ChatRequestsTab() {
   // console.log(chatRequests, 4);
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const socket = useSocket();
+  const {
+    data,
+    isError: chatRequestsError,
+    isLoading: chatRequestsLoading,
+  } = useQuery({
+    queryKey: ["chatRequests"],
+    queryFn: fetchChatRequests,
+    staleTime: 1000 * 60 * 1,
+  });
 
   const handleAccept = (request) => {
+    console.log(request, 21);
     socket.emit("notification", {
-      receiver_id: id,
+      receiver_id: request.sender_id,
       type: "chat_accept",
       message_data: {
         status: "accepted",
         message: "Chat request accepted",
-        request_id: id,
+        request_id: request.request_id,
       },
     });
   };
   return (
     <>
-      {chatRequests.length === 0 ? (
+      {data?.data?.data?.connection_requests.length === 0 ? (
         <div className="text-center w-full">No Chat Requests Available</div>
       ) : (
-        chatRequests.map((request) => (
+        data?.data?.data?.connection_requests.map((request) => (
           <div
             key={request.id}
             className="flex flex-col items-center gap-4 w-full"
@@ -37,7 +48,7 @@ function ChatRequestsTab({ chatRequests }) {
                 />
               </div>
               <span>
-                <b> {request.sender_name} </b> requested you to follow{" "}
+                <b> {request.sender_name} </b> sent you a chat request{" "}
               </span>
             </div>
             <div className="flex gap-2">

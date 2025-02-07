@@ -14,45 +14,6 @@ import RequestSentTab from "./RequestSentTab";
 function NotificationBox({ setOpenNotification }) {
   const [activeTab, setActiveTab] = useState("notifications");
 
-  // Fetch all data in the parent component
-  const {
-    data: notificationsData,
-    isError: notificationsError,
-    isLoading: notificationsLoading,
-  } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: fetchNotifications,
-    staleTime: 1000 * 60 * 1,
-  });
-
-  const {
-    data: chatRequestsData,
-    isError: chatRequestsError,
-    isLoading: chatRequestsLoading,
-  } = useQuery({
-    queryKey: ["chatRequests"],
-    queryFn: fetchChatRequests,
-    staleTime: 1000 * 60 * 1,
-  });
-
-  const {
-    data: requestsSentData,
-    isError: requestsSentError,
-    isLoading: requestsSentLoading,
-  } = useQuery({
-    queryKey: ["requestsSent"],
-    queryFn: fetchRequestsSent,
-    staleTime: 1000 * 60 * 1,
-  });
-
-  if (notificationsLoading || chatRequestsLoading || requestsSentLoading) {
-    return <Loader status="loading" />;
-  }
-
-  if (notificationsError || chatRequestsError || requestsSentError) {
-    return <div>Error fetching data</div>;
-  }
-
   return (
     <div className="h-full flex flex-col items-end justify-end space-y-4 p-4 z-50">
       <div className="flex justify-between w-full">
@@ -93,21 +54,9 @@ function NotificationBox({ setOpenNotification }) {
         </button>
       </div>
 
-      {activeTab === "notifications" && (
-        <NotificationsTab
-          notifications={notificationsData?.data?.data?.notifications}
-        />
-      )}
-      {activeTab === "chat_request" && (
-        <ChatRequestsTab
-          chatRequests={chatRequestsData?.data?.data?.connection_requests}
-        />
-      )}
-      {activeTab === "request_sent" && (
-        <RequestSentTab
-          requestsSent={requestsSentData?.data?.data?.connection_requests}
-        />
-      )}
+      {activeTab === "notifications" && <NotificationsTab />}
+      {activeTab === "chat_request" && <ChatRequestsTab />}
+      {activeTab === "request_sent" && <RequestSentTab />}
     </div>
   );
 }
