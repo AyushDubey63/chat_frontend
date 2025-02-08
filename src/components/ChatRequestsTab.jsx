@@ -5,7 +5,7 @@ import { fetchChatRequests } from "../services/api";
 
 function ChatRequestsTab() {
   // console.log(chatRequests, 4);
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const socket = useSocket();
   const {
     data,
@@ -28,6 +28,7 @@ function ChatRequestsTab() {
         request_id: request.request_id,
       },
     });
+    queryClient.invalidateQueries("chatRequests");
   };
   return (
     <>

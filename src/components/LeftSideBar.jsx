@@ -1,28 +1,78 @@
 import React, { useEffect, useState } from "react";
-import { IoNotificationsOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchUserAllChats, logoutUser } from "../services/api";
+import {
+  fetchUnreadNotificationsCount,
+  fetchUserAllChats,
+  logoutUser,
+} from "../services/api";
 import NotificationBox from "./NotificationBox";
 import FloatingActionButton from "../ui/FloatingActionButton";
+import { useSocket } from "../context/socket";
+import toast from "react-hot-toast";
+import Modal from "../ui/Modal";
+import ProfilePage from "./ProfilePage";
 
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
+  const queryClient = useQueryClient();
   const { data, isError, isLoading } = useQuery({
     queryKey: ["freinds"],
     queryFn: fetchUserAllChats,
   });
+  const { data: unreadNotificationData, isError: unreadNotificationError } =
+    useQuery({
+      queryKey: ["unread_notifications"],
+      queryFn: fetchUnreadNotificationsCount,
+    });
   const userData = data?.data?.data || {};
   const contacts = data?.data?.data?.chats || [];
+  // Socket handling remains unchanged
+  const socket = useSocket();
+  useEffect(() => {
+    const handleNotification = (data) => {
+      console.log(data, 4);
+      if (data.type === "chat_request") {
+        toast.success("You have a new chat request");
+      }
+      if (data.type === "chat_accept") {
+        toast.success("Chat request accepted successfully");
+      }
+      queryClient.invalidateQueries([
+        "notifications",
+        "chatRequests",
+        "requestsSent",
+      ]);
+    };
 
+    socket.on("notification", handleNotification);
+    return () => socket.off("notification", handleNotification);
+  }, [socket, queryClient]);
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching data</div>;
-
+  console.log(unreadNotificationData?.data?.data?.unread_count, 4);
+  const style = {
+    width: "50%",
+    maxWidth: "max-w-xl",
+  };
   return (
     <div className="max-h-screen h-full w-full relative">
+      {openProfile && (
+        <Modal
+          style={style}
+          isOpen={openProfile}
+          onClose={() => setOpenProfile(false)}
+        >
+          <ProfilePage />
+        </Modal>
+      )}
       <div className=" bg-gray-300">
         <div className=" justify-start p-2 flex  items-center gap-2">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <div
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center"
+            onClick={() => setOpenProfile(true)}
+          >
             <img
               className="h-10 w-10 rounded-full object-cover"
               src={userData.profile_pic}
@@ -67,7 +117,12 @@ function LeftSideBar({ setUser }) {
           <div>No contacts available</div>
         )}
       </ul>
-      <FloatingActionButton setOpenNotification={setOpenNotification} />
+      <FloatingActionButton
+        setOpenNotification={setOpenNotification}
+        newNotification={
+          unreadNotificationData?.data?.data?.unread_count == 0 ? false : true
+        }
+      />
     </div>
   );
 }

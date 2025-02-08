@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BsSendPlusFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 
@@ -11,6 +11,7 @@ import { useSocket } from "../context/socket";
 import toast from "react-hot-toast";
 
 function SearchNewUser({ open, setOpen }) {
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = React.useState("");
   const { debouncedValue } = useDebounce(searchTerm, 500);
   const socket = useSocket();
@@ -47,6 +48,9 @@ function SearchNewUser({ open, setOpen }) {
         status: "pending",
         message: "You have a new chat request",
       },
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["requestsSent"],
     });
     toast.success("Chat request sent successfully");
   };

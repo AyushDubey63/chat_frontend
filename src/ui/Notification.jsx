@@ -1,7 +1,15 @@
 import React from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 
-function Notification({ title, description, buttons, setNotifications, id }) {
+function Notification({
+  title,
+  description,
+  buttons,
+  setNotifications,
+  id,
+  isRead,
+}) {
+  console.log(isRead, "isRead");
   const buttonsMap = new Map();
   buttonsMap.set("accept", {
     text: "Accept",
@@ -26,7 +34,11 @@ function Notification({ title, description, buttons, setNotifications, id }) {
   });
 
   return (
-    <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg p-6 relative">
+    <div
+      className={`max-w-sm mx-auto  shadow-lg rounded-lg p-6 relative ${
+        isRead ? "bg-white" : "bg-gray-200"
+      }`}
+    >
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-xl font-semibold">{title}</h3>
@@ -43,7 +55,7 @@ function Notification({ title, description, buttons, setNotifications, id }) {
         </button>
       </div>
       <div className="flex space-x-3">
-        {buttons.map((button) => {
+        {/* {buttons.map((button) => {
           const { text, onClick, color } = buttonsMap.get(button);
           return (
             <button
@@ -53,7 +65,7 @@ function Notification({ title, description, buttons, setNotifications, id }) {
               {text}
             </button>
           );
-        })}
+        })} */}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 // DynamicModal.js
 import React from "react";
 
-const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children, style }) => {
   if (!isOpen) return null;
 
   return (
@@ -10,7 +10,11 @@ const Modal = ({ isOpen, onClose, children }) => {
       onClick={onClose} // Close the modal when clicking outside
     >
       <div
-        className="relative p-4 w-full max-w-md max-h-full bg-white rounded-lg shadow-lg "
+        className={`relative p-4 ${style?.width ? style?.width : "w-full"} ${
+          style?.maxWidth ? style?.maxWidth : "max-w-md"
+        } ${style?.height ? style?.height : ""} ${
+          style?.maxHeight ? style?.maxHeight : "max-h-full"
+        }  bg-white rounded-lg shadow-lg `}
         onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside the modal
       >
         <button

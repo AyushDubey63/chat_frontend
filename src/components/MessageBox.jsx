@@ -1,4 +1,7 @@
 import React, { useEffect, useRef } from "react";
+import { IoIosAddCircleOutline } from "react-icons/io";
+import { BsCamera } from "react-icons/bs";
+import { RiEmojiStickerFill } from "react-icons/ri";
 import chat_bg from "../assets/chat_bg.jpg";
 import { useSocket } from "../context/socket";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
@@ -61,7 +64,7 @@ function MessageBox({ user }) {
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching messages.</div>;
-
+  console.log(data, 64);
   return (
     <div
       style={{
@@ -74,8 +77,11 @@ function MessageBox({ user }) {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll} // Attach scroll handler
-        className="max-h-[90%] overflow-y-scroll scrollbar-hidden"
+        className="max-h-[90%] h-full overflow-y-scroll scrollbar-hidden"
       >
+        {data?.pages[0]?.data?.data?.messages.length === 0 && (
+          <div className="text-center w-full">No messages available</div>
+        )}
         {data?.pages
           ?.slice()
           .reverse() // Reverse the pages to maintain correct order
@@ -108,12 +114,16 @@ function MessageBox({ user }) {
         <div ref={scrollMessageRef}></div>
       </div>
       <div className="border-2 h-[10%] w-full bg-gray-200 flex justify-between items-center p-2">
-        <input
-          onChange={(e) => setMessage(e.target.value)}
-          type="text"
-          className="w-4/5 p-2 rounded-full border border-gray-400"
-          value={message}
-        />
+        <div className="w-full rounded-full items-center flex border bg-white">
+          <RiEmojiStickerFill color="gray" size={30} />
+          <input
+            onChange={(e) => setMessage(e.target.value)}
+            type="text"
+            className="w-full p-2 bg-white rounded-full outline-none"
+            value={message}
+          />
+          <BsCamera color="gray" size={30} />
+        </div>
         <button
           onClick={sendMessage}
           className="bg-blue-500 text-white p-2 rounded-full"

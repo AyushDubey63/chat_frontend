@@ -10,7 +10,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import DialogBox from "./DialogBox";
 import SearchNewUser from "../components/SearchNewUser";
 
-function FloatingActionButton({ setOpenNotification }) {
+function FloatingActionButton({ setOpenNotification, newNotification }) {
+  console.log(newNotification, 14);
   const [openLogout, setOpenLogout] = React.useState(false);
   const [searchBox, setSearchBox] = React.useState(false);
   const queryClient = useQueryClient();
@@ -39,6 +40,9 @@ function FloatingActionButton({ setOpenNotification }) {
         >
           <IoNotificationsOutline size={25} />
           <span className="tooltip text-xs">Notifications</span>
+          {newNotification && (
+            <span className="absolute h-3 w-3 bottom-6 right-[-0.3rem] rounded-full bg-blue-500 text-center text-xs"></span>
+          )}
         </button>
         <button
           onClick={() => setOpenLogout(true)}
@@ -48,8 +52,11 @@ function FloatingActionButton({ setOpenNotification }) {
           <RxExit size={25} />
           <span className="tooltip text-xs">Logout</span>
         </button>
-        <button className="button shadow-md" id="share">
+        <button className="button shadow-md relative" id="share">
           <AiOutlineAppstore size={25} />
+          {newNotification && (
+            <span className="absolute h-3 w-3 bottom-6 right-[-0.3rem] rounded-full bg-blue-500 text-center text-xs"></span>
+          )}
         </button>
       </div>
     </div>

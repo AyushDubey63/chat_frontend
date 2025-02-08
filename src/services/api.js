@@ -53,10 +53,25 @@ const searchNewContact = async ({ searchTerm }) =>
   await axios.get(`${BASE_URL}/user/search-users?search=${searchTerm}`, {
     withCredentials: true,
   });
+
 const fetchNotifications = async () =>
   await axios.get(`${BASE_URL}/notification/get-all-notifications`, {
     withCredentials: true,
   });
+
+const fetchUnreadNotificationsCount = async () =>
+  await axios.get(`${BASE_URL}/notification/get-unread-notifications-count`, {
+    withCredentials: true,
+  });
+
+const updateNotificationStatus = async ({ notification_ids }) =>
+  await axios.patch(
+    `${BASE_URL}/notification/update-notification-status`,
+    { notification_ids },
+    {
+      withCredentials: true,
+    }
+  );
 
 const fetchChatRequests = async () =>
   await axios.get(`${BASE_URL}/request/get-connection-requests-received`, {
@@ -79,4 +94,6 @@ export {
   fetchNotifications,
   fetchChatRequests,
   fetchRequestsSent,
+  updateNotificationStatus,
+  fetchUnreadNotificationsCount,
 };
