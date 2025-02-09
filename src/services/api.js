@@ -83,6 +83,12 @@ const fetchRequestsSent = async () =>
     withCredentials: true,
   });
 
+const sendMediaInChat = async (formData) => {
+  await axios.post(`${BASE_URL}/chat/send-media`, formData, {
+    withCredentials: true,
+  });
+};
+
 export {
   registerUserMutation,
   loginUserMutation,
@@ -96,4 +102,5 @@ export {
   fetchRequestsSent,
   updateNotificationStatus,
   fetchUnreadNotificationsCount,
+  sendMediaInChat,
 };
