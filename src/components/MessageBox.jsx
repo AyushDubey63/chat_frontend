@@ -1,16 +1,27 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoIosAddCircleOutline } from "react-icons/io";
-import { BsCamera } from "react-icons/bs";
+import ReactPlayer from "react-player";
+import { FaCamera } from "react-icons/fa";
+import { MdPermMedia } from "react-icons/md";
 import { RiEmojiStickerFill } from "react-icons/ri";
 import chat_bg from "../assets/chat_bg.jpg";
 import { useSocket } from "../context/socket";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchChatsByChatId } from "../services/api";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { fetchChatsByChatId, sendMediaInChat } from "../services/api";
+import axios from "axios";
 
 function MessageBox({ user }) {
-  const scrollContainerRef = useRef(null); // Ref for the scroll container
-  const scrollMessageRef = useRef(null); // Ref for auto-scroll to the bottom
-  const [message, setMessage] = React.useState("");
+  console.log(user, 18);
+  const inputRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const scrollMessageRef = useRef(null);
+  const [message, setMessage] = useState("");
+  const [selectMedia, setSelectMedia] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState(null);
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, fetchNextPage, isFetchingNextPage } =
@@ -38,6 +49,7 @@ function MessageBox({ user }) {
 
   useEffect(() => {
     socket.on("message_event", (data) => {
+      console.log(data, 52);
       queryClient.invalidateQueries(["messages", user.chat_id]);
     });
 
@@ -57,14 +69,64 @@ function MessageBox({ user }) {
 
     const { scrollTop } = scrollContainerRef.current;
     if (scrollTop === 0) {
-      // Trigger API call when scrolled to the top
       fetchNextPage();
     }
   };
 
+  const handleUploadMedia = async () => {
+    inputRef.current.click();
+  };
+
+  const mutation = useMutation({
+    mutationFn: sendMediaInChat,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["messages", user.chat_id],
+      });
+    },
+  });
+
+  const handleSendMediaFile = async () => {
+    const file = inputRef.current.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("chat_id", user.chat_id);
+      formData.append("receiver_id", user.user_id);
+      mutation.mutate(formData);
+      setSelectMedia(false);
+      setPreviewMedia(false);
+      inputRef.current.value = null;
+    } else {
+      console.log("Please select a file");
+    }
+  };
+
+  const handleMediaPreview = () => {
+    const files = inputRef.current.files[0];
+    if (files) {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files);
+      fileReader.onload = () => {
+        setPreviewMedia(fileReader.result);
+      };
+    }
+  };
+
+  const handleCloseMediaPreview = () => {
+    inputRef.current.value = null;
+    setPreviewMedia(null);
+    setSelectMedia(false);
+  };
+
+  const handleSend = () => {
+    if (previewMedia !== null) return handleSendMediaFile();
+    else sendMessage();
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching messages.</div>;
-  console.log(data, 64);
+
   return (
     <div
       style={{
@@ -72,11 +134,12 @@ function MessageBox({ user }) {
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
-      className="h-full w-full"
+      className="h-full w-full relative"
     >
       <div
+        onClick={() => setSelectMedia(false)}
         ref={scrollContainerRef}
-        onScroll={handleScroll} // Attach scroll handler
+        onScroll={handleScroll}
         className="max-h-[90%] h-full overflow-y-scroll scrollbar-hidden"
       >
         {data?.pages[0]?.data?.data?.messages.length === 0 && (
@@ -84,7 +147,7 @@ function MessageBox({ user }) {
         )}
         {data?.pages
           ?.slice()
-          .reverse() // Reverse the pages to maintain correct order
+          .reverse()
           .map((page) =>
             page.data.data.messages.map((msg) => (
               <div
@@ -95,26 +158,125 @@ function MessageBox({ user }) {
                     : "justify-end"
                 }`}
               >
-                <div
-                  className={`p-2 rounded-lg ${
-                    parseInt(msg.sender_id) === parseInt(user.user_id)
-                      ? "bg-gray-300"
-                      : "bg-blue-500 text-white"
-                  }`}
-                >
-                  <p>{msg.message}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(msg.created_at).toLocaleString()}
-                  </p>
-                </div>
+                {msg.message_type == "text" && (
+                  <div
+                    className={`p-2 rounded-lg ${
+                      parseInt(msg.sender_id) === parseInt(user.user_id)
+                        ? "bg-gray-300"
+                        : "bg-blue-500 text-white"
+                    }`}
+                  >
+                    <p>{msg.message}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(msg.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                {msg.message_type == "image" && (
+                  <div
+                    className={`w-[40%]  rounded-md p-2  ${
+                      parseInt(msg.sender_id) === parseInt(user.user_id)
+                        ? "bg-gray-300"
+                        : "bg-blue-500 text-white"
+                    }`}
+                  >
+                    <img
+                      className="w-full h-full rounded-lg"
+                      src={JSON.parse(msg.message)?.file?.path}
+                      alt=""
+                    />
+                  </div>
+                )}
+                {msg.message_type === "video" && (
+                  <div
+                    className={`w-[40%]  rounded-md p-2  ${
+                      parseInt(msg.sender_id) === parseInt(user.user_id)
+                        ? "bg-gray-300"
+                        : "bg-blue-500 text-white"
+                    }`}
+                  >
+                    <ReactPlayer
+                      controls
+                      width={"100%"}
+                      url={JSON.parse(msg.message)?.file?.path}
+                    />
+                  </div>
+                )}
               </div>
             ))
           )}
         {isFetchingNextPage && <div>Loading older messages...</div>}
         <div ref={scrollMessageRef}></div>
       </div>
-      <div className="border-2 h-[10%] w-full bg-gray-200 flex justify-between items-center p-2">
-        <div className="w-full rounded-full items-center flex border bg-white">
+      {selectMedia && (
+        <div className="bg-white shadow-2xl right-10 bottom-16 media_box absolute rounded-md flex justify-end mr-5">
+          <ul className=" p-1    flex gap-1 flex-col justify-center rounded-lg">
+            <li className=" ">
+              <button className="flex items-center gap-2">
+                <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
+                  <FaCamera color="red" size={20} />
+                </span>
+                Open camera
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={handleUploadMedia}
+                className="flex items-center gap-2"
+              >
+                <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
+                  <MdPermMedia color="orange" size={20} />
+                </span>
+                Upload media
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
+      {inputRef.current?.files?.length > 0 && (
+        <div className="bg-slate-600 p-2 w-full flex justify-center  absolute bottom-[10%] ">
+          <div className="bg-white h-52 rounded-lg relative">
+            <button
+              onClick={handleCloseMediaPreview}
+              className="absolute top-2 right-2"
+            >
+              <svg
+                className="w-3 h-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 14"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                />
+              </svg>
+            </button>
+            {previewMedia && previewMedia.startsWith("data:image") && (
+              <img
+                src={previewMedia}
+                alt="Image Preview"
+                className="object-cover h-full w-full"
+              />
+            )}
+            {previewMedia && previewMedia.startsWith("data:video") && (
+              <ReactPlayer
+                url={previewMedia}
+                playing
+                controls
+                width="100%"
+                height="100%"
+              />
+            )}
+          </div>
+        </div>
+      )}
+      <div className="border-2 h-[10%] w-full bg-gray-200 flex justify-between items-center p-2 ">
+        <div className="w-full px-2 rounded-full items-center flex border bg-white">
           <RiEmojiStickerFill color="gray" size={30} />
           <input
             onChange={(e) => setMessage(e.target.value)}
@@ -122,10 +284,20 @@ function MessageBox({ user }) {
             className="w-full p-2 bg-white rounded-full outline-none"
             value={message}
           />
-          <BsCamera color="gray" size={30} />
+          <input
+            name="media"
+            id="media"
+            className="hidden "
+            type="file"
+            onChange={handleMediaPreview}
+            ref={inputRef}
+          />
+          <button onClick={() => setSelectMedia((prev) => !prev)}>
+            <FaCamera color="gray" size={25} />
+          </button>
         </div>
         <button
-          onClick={sendMessage}
+          onClick={handleSend}
           className="bg-blue-500 text-white p-2 rounded-full"
         >
           Send
