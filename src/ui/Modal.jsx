@@ -39,7 +39,7 @@ const Modal = ({ isOpen, onClose, children, style }) => {
           </svg>
           <span className="sr-only">Close modal</span>
         </button>
-        <div className="p-6 text-center">
+        <div className="p-6 h-full text-center">
           {children} {/* Render the passed dynamic content here */}
         </div>
       </div>

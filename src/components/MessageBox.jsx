@@ -88,9 +88,15 @@ function MessageBox({ user }) {
 
   const handleSendMediaFile = async () => {
     const file = inputRef.current.files[0];
+    console.log(file, 91);
+    // return;
     if (file) {
       const formData = new FormData();
-      formData.append("image", file);
+      if (file.type.includes("video")) {
+        formData.append("video", file);
+      } else if (file.type.includes("image")) {
+        formData.append("image", file);
+      }
       formData.append("chat_id", user.chat_id);
       formData.append("receiver_id", user.user_id);
       mutation.mutate(formData);
@@ -238,7 +244,7 @@ function MessageBox({ user }) {
           <div className="bg-white h-52 rounded-lg relative">
             <button
               onClick={handleCloseMediaPreview}
-              className="absolute top-2 right-2"
+              className="absolute top-2 right-2 z-10"
             >
               <svg
                 className="w-3 h-3"
