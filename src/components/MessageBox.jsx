@@ -13,6 +13,8 @@ import {
 } from "@tanstack/react-query";
 import { fetchChatsByChatId, sendMediaInChat } from "../services/api";
 import axios from "axios";
+import Carousel from "./MediaCarousel";
+import Modal from "../ui/Modal";
 
 function MessageBox({ user }) {
   console.log(user, 18);
@@ -22,6 +24,7 @@ function MessageBox({ user }) {
   const [message, setMessage] = useState("");
   const [selectMedia, setSelectMedia] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
+  const [showMediaCarousel, setShowMediaCarousel] = useState(false);
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, fetchNextPage, isFetchingNextPage } =
@@ -148,6 +151,15 @@ function MessageBox({ user }) {
         onScroll={handleScroll}
         className="max-h-[90%] h-full overflow-y-scroll scrollbar-hidden"
       >
+        {showMediaCarousel && (
+          <Modal
+            style={{ width: "w-[90%]", maxWidth: "max-w-2xl" }}
+            isOpen={showMediaCarousel}
+            onClose={() => setShowMediaCarousel(false)}
+          >
+            <Carousel data={data} />
+          </Modal>
+        )}
         {data?.pages[0]?.data?.data?.messages.length === 0 && (
           <div className="text-center w-full">No messages available</div>
         )}
@@ -283,7 +295,9 @@ function MessageBox({ user }) {
       )}
       <div className="border-2 h-[10%] w-full bg-gray-200 flex justify-between items-center p-2 ">
         <div className="w-full px-2 rounded-full items-center flex border bg-white">
-          <RiEmojiStickerFill color="gray" size={30} />
+          <button onClick={() => setShowMediaCarousel((prev) => !prev)}>
+            <RiEmojiStickerFill color="gray" size={30} />
+          </button>
           <input
             onChange={(e) => setMessage(e.target.value)}
             type="text"
