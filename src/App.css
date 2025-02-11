@@ -67,3 +67,17 @@
   right: 5%;
   transition-duration: 0.3s;
 }
+.media_box_2::before {
+  position: absolute;
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  background-size: 1000%;
+  background-position: center;
+  transform: rotate(45deg);
+  left: -2%;
+  top: 5%;
+  transition-duration: 0.3s;
+  z-index: 1;
+}

@@ -12,7 +12,7 @@ import {
   RxTextAlignTop,
 } from "react-icons/rx";
 
-function TextStory() {
+function TextStory({ setSelectStatusData, handleSendStatus }) {
   const [bgColor, setBgColor] = useState("#f87171"); // Background color
   const [textColor, setTextColor] = useState("#000000"); // Text color
   const [fontSize, setFontSize] = useState(16); // Font size in pixels
@@ -21,7 +21,16 @@ function TextStory() {
   const [verticalAlign, setVerticalAlign] = useState("items-center");
 
   const handleSend = () => {
-    console.log("Saved text:", text);
+    const elem = document.getElementById("story-text");
+    // setSelectStatusData({type});
+    console.log(elem);
+    const data = elem.outerHTML;
+    // console.log(data.replace("h-[250px]", "h-full w-full"));
+    setSelectStatusData({
+      type: "raw",
+      data: data.replace("h-[250px]", "h-full w-full"),
+    });
+    handleSendStatus();
   };
 
   return (

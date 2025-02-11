@@ -15,12 +15,12 @@ import toast from "react-hot-toast";
 import Modal from "../ui/Modal";
 import ProfilePage from "./ProfilePage";
 import TextStory from "./TextStory";
+import ViewStatus from "./ViewStatus";
 
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [viewStatusTab, setViewStatusTab] = useState(false);
-  const [openTextStory, setOpenTextStory] = useState(false);
   const queryClient = useQueryClient();
   const { data, isError, isLoading } = useQuery({
     queryKey: ["freinds"],
@@ -61,70 +61,10 @@ function LeftSideBar({ setUser }) {
     width: "50%",
     maxWidth: "max-w-xl",
   };
-  const textStoryStyle = {
-    width: "w-[100%]",
-    maxWidth: "max-w-2xl",
-    height: "h-[80%]",
-  };
+
   return (
     <div className="max-h-screen h-full w-full relative">
-      {openTextStory && (
-        <Modal
-          style={textStoryStyle}
-          isOpen={openTextStory}
-          onClose={() => setOpenTextStory(false)}
-        >
-          <TextStory />
-        </Modal>
-      )}
-      {viewStatusTab && (
-        <div className="h-full w-full bg-gray-500 z-10">
-          {/* <TextStory /> */}
-          <div className="w-full p-4 flex items-center h-16 border-b-2">
-            <div className="flex gap-2 items-center">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                <div className="h-9 w-9 rounded-full object-cover bg-red-300 relative">
-                  <button
-                    onClick={() => setOpenTextStory(true)}
-                    className="absolute -right-1 bg-white rounded-full top-0"
-                  >
-                    <IoMdAddCircle size={15} />
-                  </button>
-                </div>
-              </div>
-              <div>My Status</div>
-            </div>
-          </div>
-          <div className="h-full p-2">
-            <ul className="gap-2 flex flex-col ">
-              <li className="">
-                <div className="p-2 flex border-b-2 border-black  items-center gap-3 justify-start">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                    <div className="h-9 w-9 rounded-full object-cover bg-red-300"></div>
-                  </div>
-                  <div>Kundan</div>
-                </div>
-              </li>
-              <li className="">
-                <div className="p-2 flex border-b-2 border-black  items-center gap-3 justify-start">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                    <div className="h-9 w-9 rounded-full object-cover bg-red-300"></div>
-                  </div>
-                  <div>Kundan</div>
-                </div>
-              </li>
-              <li className="">
-                <div className="p-2 flex border-b-2 border-black  items-center gap-3 justify-start">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                    <div className="h-9 w-9 rounded-full object-cover bg-red-300"></div>
-                  </div>
-                  <div>Kundan</div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
+      {viewStatusTab && <ViewStatus />}
       {openProfile && (
         <Modal
           style={style}

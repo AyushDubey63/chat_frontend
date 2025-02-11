@@ -89,6 +89,18 @@ const sendMediaInChat = async (formData) => {
   });
 };
 
+const addStatus = async (formData) => {
+  await axios.post(`${BASE_URL}/status/add-status`, formData, {
+    withCredentials: true,
+  });
+};
+
+const fetchStatus = async () => {
+  axios.get(`${BASE_URL}/status/get-status`, {
+    withCredentials: true,
+  });
+};
+
 export {
   registerUserMutation,
   loginUserMutation,
@@ -103,4 +115,6 @@ export {
   updateNotificationStatus,
   fetchUnreadNotificationsCount,
   sendMediaInChat,
+  addStatus,
+  fetchStatus,
 };

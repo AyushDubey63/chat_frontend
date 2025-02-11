@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import ProtectedRoute from "./wrappers/ProtectedRoute";
 import NotificationBox from "./components/NotificationBox";
+import ViewStory from "./components/ViewStory";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/stories" element={<ViewStory />} />
           {/* <Route path="/notifications" element={<NotificationBox />} /> */}
         </Routes>
       </QueryClientProvider>
