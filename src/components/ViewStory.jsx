@@ -2,6 +2,7 @@ import React from "react";
 import Stories from "react-insta-stories";
 import ReactHtmlParser from "react-html-parser";
 function transformContent(content) {
+  console.log(content, 5);
   return ReactHtmlParser(content);
 }
 const ViewStory = ({ data }) => {
@@ -11,9 +12,12 @@ const ViewStory = ({ data }) => {
     let type = story.type;
 
     if (story.type === "raw") {
+      console.log(story.data.replace("/", ""), 15);
       return {
-        content: transformContent(story.data.replace("/", "")),
-        type: "text",
+        content: () => {
+          return transformContent(story.data.replace("/", ""));
+        },
+        // type: "text",
       };
     } else {
       return {
