@@ -1,17 +1,27 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoCreate } from "react-icons/io5";
 import { IoMdAddCircle } from "react-icons/io";
 import { MdPermMedia } from "react-icons/md";
 import Modal from "../ui/Modal";
 import TextStory from "./TextStory";
-import { useMutation } from "@tanstack/react-query";
-import { addStatus } from "../services/api"; // Assuming addStatus is the mutation function
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { addStatus, fetchStatus } from "../services/api"; // Assuming addStatus is the mutation function
+import { MdOutlineLooks5 } from "react-icons/md";
+import ViewStory from "./ViewStory";
 
 function ViewStatus() {
   const [openTextStory, setOpenTextStory] = useState(false);
   const [selectStatus, setSelectStatus] = useState(false);
   const [selectStatusData, setSelectStatusData] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
+  const [openStory, setOpenStory] = useState(false);
+  const { data, isError, isFetched } = useQuery({
+    queryKey: ["status"],
+    queryFn: fetchStatus,
+  });
+  useEffect(() => {
+    console.log(data);
+  }, [data, isFetched]);
   const inputRef = useRef(null);
 
   const mutation = useMutation({
@@ -81,6 +91,13 @@ function ViewStatus() {
   return (
     <div className="h-full w-full bg-gray-500 z-10">
       {/* Text Story Modal */}
+      {openStory && (
+        <Modal isOpen={openStory} onClose={() => setOpenStory(false)}>
+          <ViewStory data={data?.data?.data} />
+        </Modal>
+      )}
+      {/* Text Story Modal */}
+
       {openTextStory && (
         <Modal isOpen={openTextStory} onClose={() => setOpenTextStory(false)}>
           <TextStory
@@ -171,6 +188,9 @@ function ViewStatus() {
             </div>
           </div>
           <div>My Status</div>
+          <button onClick={() => setOpenStory(true)}>
+            <MdOutlineLooks5 />
+          </button>
           <input
             name="media"
             id="media"

@@ -4,32 +4,25 @@ import ReactHtmlParser from "react-html-parser";
 function transformContent(content) {
   return ReactHtmlParser(content);
 }
-const ViewStory = () => {
-  const stories = [
-    {
-      id: 1,
-      type: "image",
-      url: "https://res.cloudinary.com/dh5u4lvhz/image/upload/v1739127861/onpomnqh1rk321al8cph.jpg",
-    },
-    {
-      id: 2,
-      type: "image",
-      url: "https://res.cloudinary.com/dh5u4lvhz/image/upload/v1739127996/tbfo9nzhl2khjeuzpcsd.jpg",
-    },
-    {
-      id: 3,
-      type: "video",
-      url: "https://res.cloudinary.com/dh5u4lvhz/video/upload/v1739171025/qyvs5e7txa7rri0bvm59.mp4",
-    },
-    {
-      id: 4,
-      content: () =>
-        transformContent(
-          `<div id="story-text" class="flex max-w-full h-[250px] rounded-lg p-4 justify-center overflow-hidden items-center" style="background-color: rgb(248, 113, 113); color: rgb(0, 0, 0); font-size: 16px;"><p class="whitespace-pre-wrap break-words max-w-full justify-center">sdvfbf😍scwvwev😜</p></div>`
-        ),
-    },
-  ];
+const ViewStory = ({ data }) => {
+  console.log(data, 8);
+  const stories = data.map((story) => {
+    // let url =
+    let type = story.type;
 
+    if (story.type === "raw") {
+      return {
+        content: transformContent(story.data.replace("/", "")),
+        type: "text",
+      };
+    } else {
+      return {
+        url: JSON.parse(story.data).file.path,
+        type: type,
+      };
+    }
+  });
+  console.log(stories);
   return (
     <Stories
       stories={stories}

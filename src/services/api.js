@@ -96,7 +96,7 @@ const addStatus = async (formData) => {
 };
 
 const fetchStatus = async () => {
-  axios.get(`${BASE_URL}/status/get-status`, {
+  return axios.get(`${BASE_URL}/status/get-status`, {
     withCredentials: true,
   });
 };
