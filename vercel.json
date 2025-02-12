@@ -9,6 +9,9 @@
       }
     }
   ],
+  "env": {
+    "NPM_CONFIG_OPTIONAL": "false"
+  },
   "routes": [
     {
       "src": "/(.*)",
