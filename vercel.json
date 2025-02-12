@@ -1,3 +1,5 @@
 {
+  "buildCommand": "npm rebuild @swc/core && npm run build",
+  "installCommand": "npm install",
   "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
