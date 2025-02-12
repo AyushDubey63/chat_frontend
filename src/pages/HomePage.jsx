@@ -14,7 +14,7 @@ function HomePage() {
         {user ? (
           <Chat user={user} />
         ) : (
-          <div className="h-full w-full bg-gray-300"></div>
+          <div className=" w-full bg-gray-300"></div>
         )}
       </div>
     </div>

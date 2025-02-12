@@ -101,6 +101,12 @@ const fetchStatus = async () => {
   });
 };
 
+const fetchAllChatsStatus = async () => {
+  return axios.get(`${BASE_URL}/status/get-all-chats-status`, {
+    withCredentials: true,
+  });
+};
+
 export {
   registerUserMutation,
   loginUserMutation,
@@ -117,4 +123,5 @@ export {
   sendMediaInChat,
   addStatus,
   fetchStatus,
+  fetchAllChatsStatus,
 };

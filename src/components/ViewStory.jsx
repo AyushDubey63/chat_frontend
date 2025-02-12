@@ -1,11 +1,11 @@
 import React from "react";
 import Stories from "react-insta-stories";
-import ReactHtmlParser from "react-html-parser";
+import parse from "html-react-parser";
 function transformContent(content) {
   console.log(content, 5);
-  return ReactHtmlParser(content);
+  return parse(content);
 }
-const ViewStory = ({ data }) => {
+const ViewStory = ({ data, setOpenStory }) => {
   console.log(data, 8);
   const stories = data.map((story) => {
     // let url =
@@ -21,18 +21,20 @@ const ViewStory = ({ data }) => {
       };
     } else {
       return {
-        url: JSON.parse(story.data).file.path,
+        url: story.data.file.path,
         type: type,
       };
     }
   });
-  console.log(stories);
+
   return (
     <Stories
       stories={stories}
-      defaultInterval={1500}
-      width={432}
-      height={768}
+      defaultInterval={2500}
+      width="100%"
+      height="90dvh"
+      onAllStoriesEnd={() => setOpenStory(false)}
+      keyboardNavigation={true}
     />
   );
 };

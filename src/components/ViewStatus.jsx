@@ -5,19 +5,25 @@ import { MdPermMedia } from "react-icons/md";
 import Modal from "../ui/Modal";
 import TextStory from "./TextStory";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addStatus, fetchStatus } from "../services/api"; // Assuming addStatus is the mutation function
+import { addStatus, fetchAllChatsStatus, fetchStatus } from "../services/api"; // Assuming addStatus is the mutation function
 import { MdOutlineLooks5 } from "react-icons/md";
 import ViewStory from "./ViewStory";
+import toast from "react-hot-toast";
 
-function ViewStatus() {
+function ViewStatus({ setViewStatusTab, viewStatusTab }) {
   const [openTextStory, setOpenTextStory] = useState(false);
   const [selectStatus, setSelectStatus] = useState(false);
   const [selectStatusData, setSelectStatusData] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
   const [openStory, setOpenStory] = useState(false);
+  const [storyData, setStoryData] = useState([]);
   const { data, isError, isFetched } = useQuery({
     queryKey: ["status"],
     queryFn: fetchStatus,
+  });
+  const { data: chatsStatus, isError: chatsStatusError } = useQuery({
+    queryKey: ["chats_status"],
+    queryFn: fetchAllChatsStatus,
   });
   useEffect(() => {
     console.log(data);
@@ -37,7 +43,9 @@ function ViewStatus() {
       console.error("Error adding status:", error);
     },
   });
-
+  if (chatsStatusError) {
+    toast.error("Error fetching chats status");
+  }
   const handleUploadMedia = () => {
     inputRef.current.click();
   };
@@ -87,13 +95,18 @@ function ViewStatus() {
     setMediaPreview(null);
     setSelectStatusData(null);
   };
-
+  const handleStory = (data) => {
+    setOpenStory(true);
+    setStoryData(data);
+  };
   return (
     <div className="h-full w-full bg-gray-500 z-10">
       {/* Text Story Modal */}
       {openStory && (
         <Modal isOpen={openStory} onClose={() => setOpenStory(false)}>
-          <ViewStory data={data?.data?.data} />
+          <div className="rounded-md">
+            <ViewStory setOpenStory={setOpenStory} data={storyData} />
+          </div>
         </Modal>
       )}
       {/* Text Story Modal */}
@@ -148,11 +161,32 @@ function ViewStatus() {
 
       {/* Header Section */}
       <div className="w-full p-4 flex items-center h-16 border-b-2">
+        <button
+          type="button"
+          className="absolute top-3 right-3 text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center  "
+          onClick={() => setViewStatusTab(false)}
+        >
+          <svg
+            className="w-3 h-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 14"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+            />
+          </svg>
+        </button>
         <div className="flex gap-2 items-center">
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
             <div className="h-9 w-9 rounded-full object-cover bg-red-300 relative">
               {selectStatus && (
-                <div className="bg-white shadow-2xl top-0 left-10 w-40 media_box_2 absolute rounded-md flex justify-end mr-5">
+                <div className="bg-white shadow-2xl top-0 left-10 w-40 media_box_2 absolute rounded-md flex justify-start mr-10">
                   <ul className="p-1 flex gap-1 flex-col justify-center rounded-lg">
                     <li>
                       <button
@@ -188,7 +222,7 @@ function ViewStatus() {
             </div>
           </div>
           <div>My Status</div>
-          <button onClick={() => setOpenStory(true)}>
+          <button onClick={() => handleStory(data?.data?.data)}>
             <MdOutlineLooks5 />
           </button>
           <input
@@ -206,13 +240,27 @@ function ViewStatus() {
       {/* Status List */}
       <div onClick={() => setSelectStatus(false)} className="h-full p-2">
         <ul className="gap-2 flex flex-col">
-          {[1, 2, 3].map((item) => (
-            <li key={item}>
+          {chatsStatus?.data.data?.map((item) => (
+            <li key={item.user_id}>
               <div className="p-2 flex border-b-2 border-black items-center gap-3 justify-start">
                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                  <div className="h-9 w-9 rounded-full object-cover bg-red-300"></div>
+                  {item.profile_pic && (
+                    <img
+                      src={item.profile_pic}
+                      alt="Profile"
+                      className="w-9 h-9 rounded-full object-cover"
+                    />
+                  )}
+                  {!item.profile_pic && (
+                    <div className="h-9 w-9 rounded-full object-cover bg-red-300"></div>
+                  )}
                 </div>
-                <div>Kundan</div>
+                <div>
+                  <button onClick={() => handleStory(item.status_data)}>
+                    {" "}
+                    {item.user_name}
+                  </button>{" "}
+                </div>
               </div>
             </li>
           ))}

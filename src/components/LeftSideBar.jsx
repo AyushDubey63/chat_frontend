@@ -31,8 +31,9 @@ function LeftSideBar({ setUser }) {
       queryKey: ["unread_notifications"],
       queryFn: fetchUnreadNotificationsCount,
     });
-  const userData = data?.data?.data || {};
+  const userData = data?.data?.data.user || {};
   const contacts = data?.data?.data?.chats || [];
+  console.log(userData);
   // Socket handling remains unchanged
   const socket = useSocket();
   useEffect(() => {
@@ -64,7 +65,12 @@ function LeftSideBar({ setUser }) {
 
   return (
     <div className="max-h-screen h-full w-full relative">
-      {viewStatusTab && <ViewStatus />}
+      {viewStatusTab && (
+        <ViewStatus
+          viewStatusTab={viewStatusTab}
+          setViewStatusTab={setViewStatusTab}
+        />
+      )}
       {openProfile && (
         <Modal
           style={style}
