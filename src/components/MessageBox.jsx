@@ -45,6 +45,7 @@ function MessageBox({ user }) {
   const socket = useSocket();
 
   const sendMessage = () => {
+    console.log(message);
     socket.emit("message_event", { message, chat_data: user });
     setMessage("");
     queryClient.invalidateQueries(["messages", user.chat_id]);
