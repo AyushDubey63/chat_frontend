@@ -186,7 +186,7 @@ function MessageBox({ user }) {
                     }`}
                   >
                     <p>{msg.message}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-white">
                       {new Date(msg.created_at).toLocaleString()}
                     </p>
                   </div>

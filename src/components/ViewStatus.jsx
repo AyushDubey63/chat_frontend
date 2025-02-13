@@ -4,7 +4,7 @@ import { IoMdAddCircle } from "react-icons/io";
 import { MdPermMedia } from "react-icons/md";
 import Modal from "../ui/Modal";
 import TextStory from "./TextStory";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addStatus, fetchAllChatsStatus, fetchStatus } from "../services/api"; // Assuming addStatus is the mutation function
 import { MdOutlineLooks5 } from "react-icons/md";
 import ViewStory from "./ViewStory";
@@ -17,6 +17,7 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
   const [mediaPreview, setMediaPreview] = useState(null);
   const [openStory, setOpenStory] = useState(false);
   const [storyData, setStoryData] = useState([]);
+  const queryClient = useQueryClient();
   const { data, isError, isFetched } = useQuery({
     queryKey: ["status"],
     queryFn: fetchStatus,
@@ -37,7 +38,9 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
       handleCloseMediaPreview();
       setOpenTextStory(false);
       setSelectStatus(false);
+      setSelectStatusData(null);
       setMediaPreview(null);
+      queryClient.invalidateQueries(["status"]);
     },
     onError: (error) => {
       console.error("Error adding status:", error);
@@ -102,7 +105,7 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
   return (
     <div className="h-full w-full bg-gray-500 z-10">
       {/* Text Story Modal */}
-      {openStory && (
+      {openStory && storyData.length > 0 && (
         <Modal isOpen={openStory} onClose={() => setOpenStory(false)}>
           <div className="rounded-md">
             <ViewStory setOpenStory={setOpenStory} data={storyData} />
@@ -183,43 +186,53 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
           </svg>
         </button>
         <div className="flex gap-2 items-center">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-            <div className="h-9 w-9 rounded-full object-cover bg-red-300 relative">
-              {selectStatus && (
-                <div className="bg-white shadow-2xl top-0 left-10 w-40 media_box_2 absolute rounded-md flex justify-start mr-10">
-                  <ul className="p-1 flex gap-1 flex-col justify-center rounded-lg">
-                    <li>
-                      <button
-                        onClick={() => setOpenTextStory(true)}
-                        className="flex items-center gap-2"
-                      >
-                        <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
-                          <IoCreate color="red" size={25} />
-                        </span>
-                        Create Status
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={handleUploadMedia}
-                        className="flex items-center gap-2"
-                      >
-                        <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
-                          <MdPermMedia color="orange" size={20} />
-                        </span>
-                        Upload media
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-              <button
-                onClick={() => setSelectStatus(true)}
-                className="absolute -right-1 bg-white rounded-full top-0"
-              >
-                <IoMdAddCircle size={15} />
-              </button>
-            </div>
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center relative">
+            {data?.data?.data[0]?.profile_pic && (
+              <img
+                src={data?.data?.data[0]?.profile_pic}
+                alt="Profile"
+                className="w-9 h-9 rounded-full object-cover"
+              />
+            )}
+            {!data?.data?.data[0]?.profile_pic && (
+              <div className="h-9 w-9 rounded-full object-cover bg-red-300 relative">
+                {" "}
+              </div>
+            )}
+            {selectStatus && (
+              <div className="bg-white shadow-2xl top-0 left-10 w-40 media_box_2 absolute rounded-md flex justify-start mr-10">
+                <ul className="p-1 flex gap-1 flex-col justify-center rounded-lg">
+                  <li>
+                    <button
+                      onClick={() => setOpenTextStory(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
+                        <IoCreate color="red" size={25} />
+                      </span>
+                      Create Status
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleUploadMedia}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
+                        <MdPermMedia color="orange" size={20} />
+                      </span>
+                      Upload media
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+            <button
+              onClick={() => setSelectStatus(true)}
+              className="absolute -right-1 bg-white rounded-full top-0"
+            >
+              <IoMdAddCircle size={15} />
+            </button>
           </div>
           <div>My Status</div>
           <button onClick={() => handleStory(data?.data?.data)}>

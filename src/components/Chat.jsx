@@ -11,7 +11,7 @@ function Chat({ user }) {
       <div className="h-[10vh]">
         {" "}
         {/* Adjust to 10% of the viewport height */}
-        <ReceiversName name={user.user_name} status={status} />
+        <ReceiversName user={user} status={status} />
       </div>
       <div className="w-full h-[90vh] flex flex-col ">
         {" "}
