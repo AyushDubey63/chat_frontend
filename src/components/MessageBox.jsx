@@ -172,9 +172,13 @@ function MessageBox({ user }) {
               <div
                 key={msg.id}
                 className={`flex p-2 ${
-                  parseInt(msg.sender_id) === parseInt(user.user_id)
-                    ? "justify-start"
-                    : "justify-end"
+                  user.type === "group"
+                    ? parseInt(msg.sender_id) === parseInt(user.user_id)
+                      ? "justify-end"
+                      : "justify-start"
+                    : parseInt(msg.sender_id) === parseInt(user.user_id)
+                    ? "justify-end"
+                    : "justify-start"
                 }`}
               >
                 {msg.message_type == "text" && (

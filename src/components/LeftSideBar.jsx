@@ -88,7 +88,7 @@ function LeftSideBar({ setUser }) {
           >
             <img
               className="h-10 w-10 rounded-full object-cover"
-              src={userData.profile_pic}
+              src={userData.profile_pic?.file?.path}
               alt=""
             />
           </div>
@@ -121,7 +121,7 @@ function LeftSideBar({ setUser }) {
             >
               <div className="gap-2 flex h-10 w-10 items-center rounded-full bg-white">
                 <img
-                  src={contact.profile_pic}
+                  src={contact.profile_pic?.file?.path}
                   alt={contact.user_name}
                   className="rounded-full h-10 w-10 object-cover"
                 />

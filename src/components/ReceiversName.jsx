@@ -4,12 +4,14 @@ function ReceiversName({ user, status = "offline" }) {
   console.log(user);
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
-      <div className="gap-2 flex h-10 w-10 items-center  rounded-full bg-white">
-        <img
-          src={user?.profile_pic}
-          alt=""
-          className="h-full w-full object-cover rounded-full"
-        />
+      <div className="gap-2 flex h-10 items-center rounded-full">
+        <div className="w-10 h-10 rounded-full ">
+          <img
+            src={user?.profile_pic?.file?.path}
+            alt=""
+            className="h-full w-full object-cover rounded-full"
+          />
+        </div>
         <div className=" items-center gap-2">
           <h1 className="text-white text-nowrap text-lg font-bold">
             {user.user_name}
