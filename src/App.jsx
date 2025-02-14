@@ -11,6 +11,7 @@ import SignUpPage from "./pages/SignUpPage";
 import ProtectedRoute from "./wrappers/ProtectedRoute";
 import NotificationBox from "./components/NotificationBox";
 import ViewStory from "./components/ViewStory";
+import CreateNewGroup from "./components/CreateNewGroup";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/stories" element={<ViewStory />} />
+          <Route path="/create-group" element={<CreateNewGroup />} />
           {/* <Route path="/notifications" element={<NotificationBox />} /> */}
         </Routes>
       </QueryClientProvider>
