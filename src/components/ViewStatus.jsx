@@ -189,12 +189,12 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center relative">
             {data?.data?.data[0]?.profile_pic && (
               <img
-                src={data?.data?.data[0]?.profile_pic}
+                src={data?.data?.data[0]?.profile_pic?.file?.path}
                 alt="Profile"
                 className="w-9 h-9 rounded-full object-cover"
               />
             )}
-            {!data?.data?.data[0]?.profile_pic && (
+            {!data?.data?.data[0]?.profile_pic?.file?.path && (
               <div className="h-9 w-9 rounded-full object-cover bg-red-300 relative">
                 {" "}
               </div>
@@ -257,14 +257,14 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
             <li key={item.user_id}>
               <div className="p-2 flex border-b-2 border-black items-center gap-3 justify-start">
                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                  {item.profile_pic && (
+                  {item?.profile_pic?.file?.path && (
                     <img
-                      src={item.profile_pic}
+                      src={item?.profile_pic?.file?.path}
                       alt="Profile"
                       className="w-9 h-9 rounded-full object-cover"
                     />
                   )}
-                  {!item.profile_pic && (
+                  {!item.profile_pic?.file?.path && (
                     <div className="h-9 w-9 rounded-full object-cover bg-red-300"></div>
                   )}
                 </div>
