@@ -1,7 +1,6 @@
 import React from "react";
 import Modal from "../ui/Modal";
 import Select from "react-select";
-import "./style.css";
 function CreateNewGroup() {
   const [open, setOpen] = React.useState(true);
   const handleChange = (data) => {
