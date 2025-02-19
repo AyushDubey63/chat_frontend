@@ -32,14 +32,16 @@ const loginUserMutation = async (formData) => {
   console.log(response.headers, 21);
   return response; // Return the entire response object
 };
-const authenticateUser = async () =>
-  await axios.post(
+const authenticateUser = async () => {
+  const response = await axios.post(
     `${BASE_URL}/auth/authenticate`,
     {},
     {
       withCredentials: true,
     }
   );
+  return response;
+};
 
 const logoutUser = async () =>
   await axios.post(

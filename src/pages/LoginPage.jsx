@@ -1,11 +1,24 @@
-import React from "react";
-import { useMutation } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUserMutation } from "../services/api";
+import { authenticateUser, loginUserMutation } from "../services/api";
+import Loader from "../ui/Loader";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { data, isLoading } = useQuery({
+    queryKey: ["auth"],
+    queryFn: authenticateUser,
+    retry: false,
+  });
+  useEffect(() => {
+    // If user is already authenticated, redirect to homepage
+    if (data) {
+      navigate("/");
+    }
+  }, [data, navigate]);
+
   const {
     handleSubmit,
     register,
@@ -29,10 +42,20 @@ function LoginPage() {
   const onSubmit = (data) => {
     mutation.mutate(data);
   };
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="justify-center items-center flex h-full">
+        <Loader status="loading"></Loader>
+      </div>
+    );
   }
-
+  if (mutation.isPending) {
+    return (
+      <div className="justify-center items-center flex h-full">
+        <Loader status="authenticating"></Loader>
+      </div>
+    );
+  }
   return (
     <div className="h-screen bg-gray-200 py-20 p-4 md:p-20 lg:p-32">
       <div className="max-w-sm bg-white rounded-lg overflow-hidden shadow-lg mx-auto">

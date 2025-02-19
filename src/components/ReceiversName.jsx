@@ -1,10 +1,18 @@
 import React from "react";
 import { FaVideo } from "react-icons/fa";
-function ReceiversName({ user, status = "offline" }) {
+import { LuArrowLeft } from "react-icons/lu";
+function ReceiversName({ user, status = "offline", setUser }) {
   console.log(user);
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
       <div className="gap-2 flex h-10 items-center rounded-full">
+        {
+          <div className=" block md:hidden">
+            <button onClick={() => setUser(null)}>
+              <LuArrowLeft color="white" size={25} />
+            </button>
+          </div>
+        }
         <div className="w-10 h-10 rounded-full ">
           <img
             src={user?.profile_pic?.file?.path}

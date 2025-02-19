@@ -12,6 +12,8 @@ import ProtectedRoute from "./wrappers/ProtectedRoute";
 import NotificationBox from "./components/NotificationBox";
 import ViewStory from "./components/ViewStory";
 import CreateNewGroup from "./components/CreateNewGroup";
+import ViewProfile from "./components/ViewProfile";
+import MyProfile from "./components/MyProfile";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ function App() {
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/stories" element={<ViewStory />} />
           <Route path="/create-group" element={<CreateNewGroup />} />
+          <Route path="/view-profile" element={<ViewProfile />} />
+          <Route path="/my-profile" element={<MyProfile />} />
           {/* <Route path="/notifications" element={<NotificationBox />} /> */}
         </Routes>
       </QueryClientProvider>

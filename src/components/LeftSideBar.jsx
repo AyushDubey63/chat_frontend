@@ -16,6 +16,7 @@ import Modal from "../ui/Modal";
 import ProfilePage from "./ProfilePage";
 import TextStory from "./TextStory";
 import ViewStatus from "./ViewStatus";
+import Loader from "../ui/Loader";
 
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
@@ -55,7 +56,12 @@ function LeftSideBar({ setUser }) {
     socket.on("notification", handleNotification);
     return () => socket.off("notification", handleNotification);
   }, [socket, queryClient]);
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="justify-center items-center flex h-full">
+        <Loader status="loading"></Loader>
+      </div>
+    );
   if (isError) return <div>Error fetching data</div>;
   console.log(unreadNotificationData?.data?.data?.unread_count, 4);
   const style = {
@@ -81,7 +87,7 @@ function LeftSideBar({ setUser }) {
         </Modal>
       )}
       <div className=" bg-gray-300">
-        <div className=" justify-start p-2 flex  items-center gap-2">
+        <div className=" justify-between lg:justify-start p-2 flex  items-center gap-2">
           <div
             className="w-10 h-10 bg-white rounded-full flex items-center justify-center"
             onClick={() => setOpenProfile(true)}
@@ -92,7 +98,7 @@ function LeftSideBar({ setUser }) {
               alt=""
             />
           </div>
-          <h2 className="text-center text-lg font-semibold">
+          <h2 className="text-center hidden lg:block text-lg font-semibold">
             {userData.user_name}
           </h2>
           <button onClick={() => setViewStatusTab(true)}>
