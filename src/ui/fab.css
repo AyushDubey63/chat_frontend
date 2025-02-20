@@ -55,6 +55,9 @@
 #button-container:hover > #logout {
   translate: -50% -320%;
 }
+#button-container:hover > #group {
+  translate: -50% -440%;
+}
 .tooltip {
   position: absolute;
   right: -20px;

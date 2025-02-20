@@ -109,6 +109,17 @@ const fetchAllChatsStatus = async () => {
   });
 };
 
+const fetchUserDetails = async () =>
+  await axios.get(`${BASE_URL}/user/get-user-details`, {
+    withCredentials: true,
+  });
+
+const updateUserDetails = async (formData) => {
+  await axios.patch(`${BASE_URL}/user/update-user`, formData, {
+    withCredentials: true,
+  });
+};
+
 export {
   registerUserMutation,
   loginUserMutation,
@@ -126,4 +137,6 @@ export {
   addStatus,
   fetchStatus,
   fetchAllChatsStatus,
+  fetchUserDetails,
+  updateUserDetails,
 };

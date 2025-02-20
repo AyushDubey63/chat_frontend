@@ -3,6 +3,7 @@ import { AiOutlineAppstore } from "react-icons/ai";
 import { FiPlus } from "react-icons/fi";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { RxExit } from "react-icons/rx";
+import { TiGroupOutline } from "react-icons/ti";
 
 import "./fab.css";
 import { logoutUser } from "../services/api";
@@ -29,6 +30,9 @@ function FloatingActionButton({ setOpenNotification, newNotification }) {
       />
       <SearchNewUser open={searchBox} setOpen={setSearchBox} />
       <div id="button-container">
+        <button className="button faq-button" id="group">
+          <TiGroupOutline size={25} />
+        </button>
         <button className="button faq-button" id="dribbble">
           <FiPlus onClick={() => setSearchBox(true)} size={25} />
           <span className="tooltip text-xs text-nowrap">New Contact</span>

@@ -2,18 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { FaCamera } from "react-icons/fa";
 import { useForm } from "react-hook-form";
-import {
-  getUserDetails,
-  updateUserDetails,
-  updateProfileImage,
-} from "../services/api"; // Assuming you have these functions
+import { updateUserDetails, fetchUserDetails } from "../services/api";
 
 function MyProfile() {
   const inputRef = useRef();
-  const [isEditing, setIsEditing] = useState(false); // To toggle the edit mode for text fields
+  const [isEditing, setIsEditing] = useState(false);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["getUserDetails"],
-    queryFn: getUserDetails,
+    queryFn: fetchUserDetails,
     retry: false,
   });
 
@@ -24,24 +20,13 @@ function MyProfile() {
     formState: { errors },
   } = useForm();
 
-  // UseMutation for updating user profile details
-  const updateUserMutation = useMutation(updateUserDetails, {
+  const updateUserMutation = useMutation({
+    mutationFn: updateUserDetails,
     onSuccess: (updatedData) => {
       console.log("User details updated:", updatedData);
-      // You can also trigger a refetch here if you need to show updated data
     },
     onError: (error) => {
       console.error("Error updating user details:", error);
-    },
-  });
-
-  // UseMutation for updating profile image
-  const updateImageMutation = useMutation(updateProfileImage, {
-    onSuccess: (updatedImage) => {
-      console.log("Profile image updated:", updatedImage);
-    },
-    onError: (error) => {
-      console.error("Error updating profile image:", error);
     },
   });
 
@@ -50,8 +35,8 @@ function MyProfile() {
     const file = inputRef.current.files[0];
     if (file) {
       const formData = new FormData();
-      formData.append("image", file);
-      updateImageMutation.mutate(formData);
+      formData.append("files", file);
+      updateUserMutation.mutate(formData);
     }
   };
 
@@ -60,140 +45,158 @@ function MyProfile() {
     updateUserMutation.mutate(data);
   };
 
-  // Set default values from the fetched data when available
   useEffect(() => {
     if (data) {
-      setValue("first_name", data.first_name);
-      setValue("last_name", data.last_name);
-      setValue("email", data.email);
-      setValue("about", data.about);
+      setValue("first_name", data?.data?.data?.first_name);
+      setValue("last_name", data?.data?.data?.last_name);
+      setValue("email", data?.data?.data?.email);
+      setValue("bio", data?.data?.data?.bio);
     }
   }, [data, setValue]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading user details</div>;
+  if (isLoading) return <div className="text-center py-10">Loading...</div>;
+  if (isError)
+    return <div className="text-center py-10">Error loading user details</div>;
 
   return (
-    <div className="min-h-screen shadow-lg w-[30%] bg-white py-6 px-4">
-      {/* Profile Image and Edit Button */}
-      <div className="flex flex-col items-center">
-        <div className="rounded-full h-28 w-28 relative border-2 border-blue-500">
-          <img
-            className="rounded-full h-full w-full"
-            src={data.profile_image || "https://via.placeholder.com/150"}
-            alt="Profile"
-          />
-          <input
-            ref={inputRef}
-            className="hidden"
-            type="file"
-            onChange={handleImageChange}
-          />
-          <div className="bg-gray-300 rounded-full w-6 h-6 absolute bottom-3 -right-0">
-            <button
-              className="rounded-full border-2 border-blue-500 h-full w-full flex items-center justify-center"
-              onClick={() => inputRef.current.click()}
-            >
-              <FaCamera fill="red" />
-            </button>
-          </div>
-        </div>
-        <span>{data.username}</span>
-      </div>
-
-      {/* Profile Info */}
-      <div className="rounded-b-lg mt-6 p-6 max-w-4xl mx-auto">
-        {/* Full Name */}
-        <div className="flex justify-between items-center">
-          <div>
-            <input
-              {...register("first_name", {
-                required: "First name cannot be empty",
-              })}
-              type="text"
-              defaultValue={data.first_name}
-              disabled={!isEditing}
-              className={`border p-2 rounded ${
-                isEditing ? "border-blue-500" : "bg-gray-100"
-              }`}
-            />
-            <input
-              {...register("last_name", {
-                required: "Last name cannot be empty",
-              })}
-              type="text"
-              defaultValue={data.last_name}
-              disabled={!isEditing}
-              className={`border p-2 rounded ${
-                isEditing ? "border-blue-500" : "bg-gray-100"
-              }`}
-            />
-          </div>
+    <div className="min-h-screen w-full bg-gray-50 py-8 px-6">
+      <div className="max-w-lg mx-auto bg-white shadow-lg rounded-lg overflow-hidden relative">
+        <div className="flex absolute top-2 right-2 justify-between items-center p-6">
           <button
-            className="text-blue-500"
+            className="text-blue-600 font-semibold"
             onClick={() => setIsEditing((prev) => !prev)}
           >
             {isEditing ? "Cancel" : "Edit"}
           </button>
         </div>
 
-        {/* About Section */}
-        <div className="mt-4">
-          <textarea
-            {...register("about")}
-            defaultValue={data.about}
-            disabled={!isEditing}
-            className={`border p-2 rounded w-full ${
-              isEditing ? "border-blue-500" : "bg-gray-100"
-            }`}
-          ></textarea>
+        {/* Profile Image and Edit Button */}
+        <div className="flex flex-col items-center py-6 border-t border-gray-200">
+          <div className="relative mb-4">
+            <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-blue-600">
+              <img
+                className="w-full h-full object-cover"
+                src={
+                  data?.data?.data?.profile_pic?.file?.path ||
+                  "https://via.placeholder.com/150"
+                }
+                alt="Profile"
+              />
+            </div>
+            <input
+              ref={inputRef}
+              className="hidden"
+              type="file"
+              onChange={handleImageChange}
+            />
+            <div className="absolute bottom-2 right-2 bg-white p-2 rounded-full border-2 border-blue-600">
+              <button
+                className="flex items-center justify-center"
+                onClick={() => inputRef.current.click()}
+              >
+                <FaCamera className="text-blue-600" />
+              </button>
+            </div>
+          </div>
+          <span className="text-xl font-semibold text-blue-600">
+            {data?.data?.data?.user_name}
+          </span>
         </div>
 
-        {/* Contact Info */}
-        <div className="mt-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center text-gray-700">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-6 h-6 text-blue-500"
+        {/* Profile Info */}
+        <div className="p-6 ">
+          <div className="space-y-2">
+            <div className="flex gap-2 justify-between">
+              <div className="w-full">
+                <label
+                  htmlFor="first_name"
+                  className="text-sm text-gray-600 block text-start"
+                >
+                  First Name
+                </label>
+                <input
+                  {...register("first_name", {
+                    required: "First name cannot be empty",
+                  })}
+                  type="text"
+                  defaultValue={data?.data?.data?.first_name}
+                  disabled={!isEditing}
+                  className={`border p-3 rounded-lg text-lg w-full mt-2 ${
+                    isEditing ? "border-blue-500" : "bg-gray-100"
+                  }`}
+                />
+              </div>
+              <div className="w-full">
+                <label
+                  htmlFor="last_name"
+                  className="text-sm text-gray-600 block text-start"
+                >
+                  Last Name
+                </label>
+                <input
+                  {...register("last_name", {
+                    required: "Last name cannot be empty",
+                  })}
+                  type="text"
+                  defaultValue={data?.data?.data?.last_name}
+                  disabled={!isEditing}
+                  className={`border p-3 rounded-lg text-lg w-full mt-2 ${
+                    isEditing ? "border-blue-500" : "bg-gray-100"
+                  }`}
+                />
+              </div>
+            </div>
+            <div className="w-full flex flex-col">
+              <label
+                htmlFor="email"
+                className="text-sm text-gray-600 block text-start"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 5h18M3 10h18M3 15h18M3 20h18"
-                ></path>
-              </svg>
+                Email
+              </label>
               <input
                 {...register("email")}
-                defaultValue={data.email}
-                disabled={!isEditing}
-                className={`border p-2 rounded ${
+                defaultValue={data?.data?.data.email}
+                disabled={true}
+                className={`border p-3 rounded-lg text-lg w-full mt-2 ${
                   isEditing ? "border-blue-500" : "bg-gray-100"
                 }`}
               />
             </div>
           </div>
-        </div>
 
-        {/* Save Button */}
-        {isEditing && (
-          <div className="mt-4 flex justify-end">
-            <button
-              type="button"
-              className="bg-blue-500 text-white p-2 rounded"
-              onClick={handleSubmit(onSubmit)}
+          {/* About Section */}
+          <div className="space-y-2">
+            <label
+              htmlFor="bio"
+              className="text-sm text-gray-600 block text-start"
             >
-              Save
-            </button>
+              Bio
+            </label>
+            <textarea
+              {...register("bio")}
+              defaultValue={data?.data?.data?.bio}
+              disabled={!isEditing}
+              className={`border p-3 rounded-lg w-full h-24 text-lg resize-none mt-2 ${
+                isEditing ? "border-blue-500" : "bg-gray-100"
+              }`}
+            ></textarea>
           </div>
-        )}
+
+          {/* Save Button */}
+          {isEditing && (
+            <div className="flex justify-end ">
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+                onClick={handleSubmit(onSubmit)}
+              >
+                Save
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
 export default MyProfile;

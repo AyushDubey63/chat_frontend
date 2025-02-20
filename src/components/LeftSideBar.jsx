@@ -17,6 +17,7 @@ import ProfilePage from "./ProfilePage";
 import TextStory from "./TextStory";
 import ViewStatus from "./ViewStatus";
 import Loader from "../ui/Loader";
+import MyProfile from "./MyProfile";
 
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
@@ -83,9 +84,10 @@ function LeftSideBar({ setUser }) {
           isOpen={openProfile}
           onClose={() => setOpenProfile(false)}
         >
-          <ProfilePage />
+          <MyProfile />
         </Modal>
       )}
+      {}
       <div className=" bg-gray-300">
         <div className=" justify-between lg:justify-start p-2 flex  items-center gap-2">
           <div
