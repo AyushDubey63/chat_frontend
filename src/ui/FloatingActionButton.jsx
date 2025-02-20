@@ -32,6 +32,7 @@ function FloatingActionButton({ setOpenNotification, newNotification }) {
       <div id="button-container">
         <button className="button faq-button" id="group">
           <TiGroupOutline size={25} />
+          <span className="tooltip text-xs text-nowrap">New Group</span>
         </button>
         <button className="button faq-button" id="dribbble">
           <FiPlus onClick={() => setSearchBox(true)} size={25} />
