@@ -114,6 +114,15 @@ const fetchUserDetails = async () =>
     withCredentials: true,
   });
 
+const fetchUserDetailsById = async (userId) => {
+  return await axios.get(
+    `${BASE_URL}/user/get-user-details-by-id?user_id=${userId}`,
+    {
+      withCredentials: true,
+    }
+  );
+};
+
 const updateUserDetails = async (formData) => {
   await axios.patch(`${BASE_URL}/user/update-user`, formData, {
     withCredentials: true,
@@ -139,4 +148,5 @@ export {
   fetchAllChatsStatus,
   fetchUserDetails,
   updateUserDetails,
+  fetchUserDetailsById,
 };

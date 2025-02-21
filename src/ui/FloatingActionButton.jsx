@@ -10,11 +10,14 @@ import { logoutUser } from "../services/api";
 import { useQueryClient } from "@tanstack/react-query";
 import DialogBox from "./DialogBox";
 import SearchNewUser from "../components/SearchNewUser";
+import Modal from "./Modal";
+import CreateNewGroup from "../components/CreateNewGroup";
 
 function FloatingActionButton({ setOpenNotification, newNotification }) {
   console.log(newNotification, 14);
   const [openLogout, setOpenLogout] = React.useState(false);
   const [searchBox, setSearchBox] = React.useState(false);
+  const [newGroup, setNewGroup] = React.useState(false);
   const queryClient = useQueryClient();
   const handleLogoutUser = async () => {
     await logoutUser();
@@ -29,8 +32,21 @@ function FloatingActionButton({ setOpenNotification, newNotification }) {
         onClose={() => setOpenLogout(false)}
       />
       <SearchNewUser open={searchBox} setOpen={setSearchBox} />
+      {newGroup && (
+        <Modal
+          style={{ height: "h-full" }}
+          isOpen={newGroup}
+          onClose={() => setNewGroup(false)}
+        >
+          <CreateNewGroup />
+        </Modal>
+      )}
       <div id="button-container">
-        <button className="button faq-button" id="group">
+        <button
+          onClick={() => setNewGroup(true)}
+          className="button faq-button"
+          id="group"
+        >
           <TiGroupOutline size={25} />
           <span className="tooltip text-xs text-nowrap">New Group</span>
         </button>
