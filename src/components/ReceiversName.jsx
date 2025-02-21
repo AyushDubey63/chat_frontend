@@ -9,7 +9,11 @@ function ReceiversName({ user, status = "offline", setUser }) {
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
       {viewProfile && (
-        <Modal isOpen={viewProfile} onClose={() => setViewProfile(false)}>
+        <Modal
+          style={{ justify: "justify-end" }}
+          isOpen={viewProfile}
+          onClose={() => setViewProfile(false)}
+        >
           <ViewProfile id={user.u_id} type={user.type} />
         </Modal>
       )}

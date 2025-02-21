@@ -241,10 +241,13 @@ function CreateNewGroup() {
         className="flex flex-col gap-2 justify-between"
       >
         <div>
-          <label htmlFor="text-sm text-gray-600 block text-start">
+          <label
+            htmlFor="group_icon"
+            className="text-sm text-gray-600 block text-start"
+          >
             Choose Group Icon:
           </label>
-          <div className="">
+          <div className="flex justify-center">
             {previewImage && (
               <div className="w-32 h-32 border border-black rounded-full  relative">
                 <button
