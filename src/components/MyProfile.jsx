@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaCamera } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { updateUserDetails, fetchUserDetails } from "../services/api";
@@ -13,6 +13,7 @@ function MyProfile() {
     retry: false,
   });
 
+  const queryClient = useQueryClient();
   const {
     handleSubmit,
     register,
@@ -24,6 +25,7 @@ function MyProfile() {
     mutationFn: updateUserDetails,
     onSuccess: (updatedData) => {
       console.log("User details updated:", updatedData);
+      queryClient.invalidateQueries(["getUserDetails"]);
     },
     onError: (error) => {
       console.error("Error updating user details:", error);

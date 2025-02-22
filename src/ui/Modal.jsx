@@ -7,7 +7,7 @@ const Modal = ({ isOpen, onClose, children, style }) => {
   return (
     <div
       className={`fixed inset-0 z-50 flex ${
-        style.justify ? style.justify : "justify-center"
+        style?.justify ? style.justify : "justify-center"
       }  items-center bg-gray-500 bg-opacity-50`}
       onClick={onClose} // Close the modal when clicking outside
     >

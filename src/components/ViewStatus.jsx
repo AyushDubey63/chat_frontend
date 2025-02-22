@@ -64,6 +64,7 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
         setMediaPreview(fileReader.result);
         setSelectStatusData({ type: type, file }); // Store media file for sending
       };
+      setSelectStatus(false);
     }
   };
 
@@ -119,7 +120,6 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
           <TextStory
             setSelectStatusData={setSelectStatusData}
             handleSendStatus={handleSendStatus}
-            onClose={() => setOpenTextStory(false)}
           />
         </Modal>
       )}
@@ -204,7 +204,10 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
                 <ul className="p-1 flex gap-1 flex-col justify-center rounded-lg">
                   <li>
                     <button
-                      onClick={() => setOpenTextStory(true)}
+                      onClick={() => {
+                        setOpenTextStory(true);
+                        setSelectStatus(false);
+                      }}
                       className="flex items-center gap-2"
                     >
                       <span className="w-8 h-8 flex items-center bg-white justify-center rounded-lg">
@@ -232,12 +235,24 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
               className="absolute -right-1 bg-white rounded-full top-0"
             >
               <IoMdAddCircle size={15} />
+              {/* <div className="relative group">
+                <span className="text-xs absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Add
+                </span>
+              </div> */}
             </button>
           </div>
-          <div>My Status</div>
-          <button onClick={() => handleStory(data?.data?.data)}>
-            <MdOutlineLooks5 />
-          </button>
+          <div>
+            {data?.data?.data.length > 0 ? (
+              <div>
+                <button onClick={() => handleStory(data?.data?.data)}>
+                  View Status
+                </button>
+              </div>
+            ) : (
+              <div> Add Status</div>
+            )}
+          </div>
           <input
             name="media"
             id="media"

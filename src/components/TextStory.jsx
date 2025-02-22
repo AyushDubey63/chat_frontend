@@ -31,6 +31,7 @@ function TextStory({ setSelectStatusData, handleSendStatus }) {
       data: data.replace("h-[250px]", "h-full w-full"),
     });
     handleSendStatus();
+    console.log("send");
   };
 
   return (
@@ -118,7 +119,7 @@ function TextStory({ setSelectStatusData, handleSendStatus }) {
       {/* Display the styled text */}
       <div
         id="story-text"
-        className={`flex max-w-full h-[250px] rounded-lg p-4 justify-center overflow-hidden ${verticalAlign}`}
+        className={`flex max-w-full h-[250px]  p-4 justify-center overflow-hidden ${verticalAlign}`}
         style={{
           backgroundColor: bgColor,
           color: textColor,
@@ -140,6 +141,7 @@ function TextStory({ setSelectStatusData, handleSendStatus }) {
             onChange={setText}
             placeholder="Type a message"
             className="w-full max-h-12 h-12"
+            keepOpened={true}
           />
         </div>
         <button
