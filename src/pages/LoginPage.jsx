@@ -32,11 +32,19 @@ function LoginPage() {
       navigate("/");
     },
     onError: (error) => {
-      console.error(error);
-      setError("password", {
-        type: "manual",
-        message: "Invalid email or password",
-      });
+      console.error(error.message);
+      if (error.message === "User not verified") {
+        setError("password", {
+          type: "manual",
+          message:
+            "User not verified, Please check your email for otp verification",
+        });
+      } else {
+        setError("password", {
+          type: "manual",
+          message: "Invalid email or password",
+        });
+      }
     },
   });
   const onSubmit = (data) => {

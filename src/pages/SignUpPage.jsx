@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUserMutation } from "../services/api";
+import toast from "react-hot-toast";
 
 function SignUpPage() {
   const navigate = useNavigate();
@@ -16,7 +17,12 @@ function SignUpPage() {
   password.current = watch("password", "");
   const mutation = useMutation({
     mutationFn: registerUserMutation,
-    onSuccess: () => navigate("/login"),
+    onSuccess: () => {
+      navigate("/login");
+      toast.success(
+        "Account account registered successfully.An email has been sent to you for verification"
+      );
+    },
     onError: (error) => console.error(error),
   });
   const onSubmit = (data) => {
