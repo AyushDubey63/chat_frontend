@@ -14,6 +14,7 @@ import ViewStory from "./components/ViewStory";
 import CreateNewGroup from "./components/CreateNewGroup";
 import ViewProfile from "./components/ViewProfile";
 import MyProfile from "./components/MyProfile";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -40,7 +41,7 @@ function App() {
           <Route path="/create-group" element={<CreateNewGroup />} />
           <Route path="/view-profile" element={<ViewProfile />} />
           <Route path="/my-profile" element={<MyProfile />} />
-          {/* <Route path="/notifications" element={<NotificationBox />} /> */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

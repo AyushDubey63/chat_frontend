@@ -119,12 +119,12 @@ function LoginPage() {
               >
                 Sign In
               </button>
-              <a
+              <Link
                 className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-                href="#"
+                to="/forgot-password"
               >
                 Forgot Password?
-              </a>
+              </Link>
             </div>
           </form>
         </div>

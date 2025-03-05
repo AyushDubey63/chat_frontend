@@ -129,6 +129,9 @@ const updateUserDetails = async (formData) => {
   });
 };
 
+const forgotPassword = async ({ email }) => {
+  return await axios.post(`${BASE_URL}/auth/forgot-password`, { email });
+};
 export {
   registerUserMutation,
   loginUserMutation,
@@ -149,4 +152,5 @@ export {
   fetchUserDetails,
   updateUserDetails,
   fetchUserDetailsById,
+  forgotPassword,
 };
