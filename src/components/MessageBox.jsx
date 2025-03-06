@@ -150,7 +150,7 @@ function MessageBox({ user }) {
         onClick={() => setSelectMedia(false)}
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="max-h-[90%] h-full overflow-y-scroll scrollbar-hidden"
+        className="h-[90%] overflow-y-scroll scrollbar-hidden"
       >
         {showMediaCarousel && (
           <Modal

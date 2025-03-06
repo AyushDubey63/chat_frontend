@@ -43,7 +43,7 @@ function Chat({ user, setUser }) {
         {/* ReceiversName takes up 10% of the viewport height */}
         <ReceiversName setUser={setUser} user={user} status={status} />
       </div>
-      <div className="flex-grow overflow-y-auto">
+      <div className="flex-grow overflow-y-auto h-full">
         {/* MessageBox takes up the remaining space */}
         <MessageBox user={user} setStatus={setStatus} />
       </div>
