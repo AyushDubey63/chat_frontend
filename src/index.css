@@ -6,10 +6,6 @@
   margin: 0;
   padding: 0;
 }
-
-body {
-  position: relative;
-}
 /* Hide scrollbars in all browsers */
 .scrollbar-hidden {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
