@@ -37,9 +37,9 @@ function Chat({ user, setUser }) {
   // }, [setUser]);
 
   return (
-    <div className="h-dvh w-full bg-gray-300 flex flex-col">
+    <div className="h-screen w-full bg-gray-300 flex flex-col">
       {/* Full height of the viewport */}
-      <div className="flex-shrink-0 h-[10vh]">
+      <div className="flex-shrink-0 ">
         {/* ReceiversName takes up 10% of the viewport height */}
         <ReceiversName setUser={setUser} user={user} status={status} />
       </div>
