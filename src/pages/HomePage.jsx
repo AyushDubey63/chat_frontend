@@ -6,7 +6,7 @@ function HomePage() {
   const [user, setUser] = React.useState(null);
 
   return (
-    <div className="grid max-h-screen overflow-hidden h-screen w-full grid-cols-1 md:grid-cols-9">
+    <div className="grid max-h-dvh overflow-hidden h-dvh w-full grid-cols-1 md:grid-cols-9">
       <div
         className={`scrollbar-hidden col-span-1 ${
           user ? "hidden md:block" : ""
