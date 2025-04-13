@@ -70,7 +70,7 @@ function LeftSideBar({ setUser }) {
   };
 
   return (
-    <div className="max-h-screen h-full w-full relative">
+    <div className="max-h-screen bg-gray-100 h-full w-full relative">
       {viewStatusTab && (
         <ViewStatus
           viewStatusTab={viewStatusTab}
@@ -88,7 +88,7 @@ function LeftSideBar({ setUser }) {
         </Modal>
       )}
       {}
-      <div className=" bg-gray-300">
+      <div className=" bg-gray-100">
         <div className=" justify-between lg:justify-start p-2 flex  items-center gap-2">
           <div
             className="w-10 h-10 bg-white rounded-full flex items-center justify-center"

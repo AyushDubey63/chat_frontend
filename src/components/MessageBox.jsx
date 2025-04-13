@@ -297,7 +297,7 @@ function MessageBox({ user }) {
           </div>
         </div>
       )}
-      <div className="border-2 h-[10%] w-full bg-gray-200 flex justify-between items-center p-2 ">
+      <div className="border-2 h-[10%] gap-2 w-full bg-gray-200 flex justify-between items-center p-2 ">
         <div className="w-full px-2 rounded-full items-center flex border bg-white">
           <button onClick={() => setShowMediaCarousel((prev) => !prev)}>
             <RiEmojiStickerFill color="gray" size={30} />
