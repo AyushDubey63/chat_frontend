@@ -5,38 +5,44 @@ import { IoMdAddCircle } from "react-icons/io";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchUnreadNotificationsCount,
-  fetchUserAllChats,
-  logoutUser,
+  fetchUserDetails,
 } from "../services/api";
 import NotificationBox from "./NotificationBox";
 import FloatingActionButton from "../ui/FloatingActionButton";
 import { useSocket } from "../context/socket";
 import toast from "react-hot-toast";
 import Modal from "../ui/Modal";
-import ProfilePage from "./ProfilePage";
-import TextStory from "./TextStory";
 import ViewStatus from "./ViewStatus";
-import Loader from "../ui/Loader";
 import MyProfile from "./MyProfile";
+import useDebounce from "../utils/useDebounce";
+import ContactList from "./ContactList";
 
 function LeftSideBar({ setUser }) {
   const [openNotification, setOpenNotification] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { debouncedValue } = useDebounce(searchTerm, 500);
   const [openProfile, setOpenProfile] = useState(false);
   const [viewStatusTab, setViewStatusTab] = useState(false);
   const queryClient = useQueryClient();
-  const { data, isError, isLoading } = useQuery({
-    queryKey: ["freinds"],
-    queryFn: fetchUserAllChats,
+
+  const {
+    data: userDetails,
+    isError: userDataError,
+    isLoading: userDataLoding,
+  } = useQuery({
+    queryKey: ["user"],
+    queryFn: fetchUserDetails,
   });
+
   const { data: unreadNotificationData, isError: unreadNotificationError } =
     useQuery({
       queryKey: ["unread_notifications"],
       queryFn: fetchUnreadNotificationsCount,
     });
-  const userData = data?.data?.data.user || {};
-  const contacts = data?.data?.data?.chats || [];
+  const userData = userDetails?.data?.data || {};
+
   console.log(userData);
-  // Socket handling remains unchanged
+
   const socket = useSocket();
   useEffect(() => {
     const handleNotification = (data) => {
@@ -57,14 +63,7 @@ function LeftSideBar({ setUser }) {
     socket.on("notification", handleNotification);
     return () => socket.off("notification", handleNotification);
   }, [socket, queryClient]);
-  if (isLoading)
-    return (
-      <div className="justify-center items-center flex h-full">
-        <Loader status="loading"></Loader>
-      </div>
-    );
-  if (isError) return <div>Error fetching data</div>;
-  console.log(unreadNotificationData?.data?.data?.unread_count, 4);
+
   const style = {
     width: "50%",
     maxWidth: "max-w-xl",
@@ -76,6 +75,7 @@ function LeftSideBar({ setUser }) {
         <ViewStatus
           viewStatusTab={viewStatusTab}
           setViewStatusTab={setViewStatusTab}
+          userData={userData}
         />
       )}
       {openProfile && (
@@ -92,18 +92,27 @@ function LeftSideBar({ setUser }) {
         <div className=" justify-between lg:justify-start p-2 flex  items-center gap-2">
           <div
             className="w-10 h-10 bg-white rounded-full flex items-center justify-center"
-            onClick={() => setOpenProfile(true)}
+            onClick={() => {
+              setOpenProfile(true);
+            }}
           >
-            <img
-              className="h-10 w-10 rounded-full object-cover"
-              src={userData.profile_pic?.file?.path}
-              alt=""
-            />
+            <button type="button">
+              <img
+                className="h-10 w-10 rounded-full object-cover"
+                src={userData.profile_pic?.file?.path}
+                alt=""
+              />
+            </button>
           </div>
           <h2 className="text-center hidden lg:block text-lg font-semibold">
-            {userData.user_name}
+            {userData?.user_name}
           </h2>
-          <button onClick={() => setViewStatusTab(true)}>
+          <button
+            onClick={() => {
+              setViewStatusTab(true);
+              setUser(null);
+            }}
+          >
             <svg
               fill="none"
               height="24"
@@ -126,8 +135,9 @@ function LeftSideBar({ setUser }) {
             </svg>
           </button>
         </div>
-        <div className="border p-2 border-black flex gap-2 items-center">
+        <div className="border p-2 flex gap-2 items-center">
           <input
+            onChange={(e) => setSearchTerm(e.target.value)}
             type="text"
             className="w-full outline-none p-2 bg-white rounded-xl"
           />
@@ -139,25 +149,8 @@ function LeftSideBar({ setUser }) {
       <ul className="max-h-[84%] overflow-y-scroll scrollbar-hidden">
         {openNotification ? (
           <NotificationBox setOpenNotification={setOpenNotification} />
-        ) : contacts.length > 0 ? (
-          contacts.map((contact) => (
-            <li
-              onClick={() => setUser(contact)}
-              className="p-2 h-14 cursor-pointer flex gap-2 items-center border-black border"
-              key={contact.user_id}
-            >
-              <div className="gap-2 flex h-10 w-10 items-center rounded-full bg-white">
-                <img
-                  src={contact.profile_pic?.file?.path}
-                  alt={contact.user_name}
-                  className="rounded-full h-10 w-10 object-cover"
-                />
-              </div>
-              <span>{contact.user_name}</span>
-            </li>
-          ))
         ) : (
-          <div>No contacts available</div>
+          <ContactList searchTerm={debouncedValue} setUser={setUser} />
         )}
       </ul>
       <FloatingActionButton

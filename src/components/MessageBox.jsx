@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { IoIosAddCircleOutline } from "react-icons/io";
 import ReactPlayer from "react-player";
 import { FaCamera } from "react-icons/fa";
 import { MdPermMedia } from "react-icons/md";

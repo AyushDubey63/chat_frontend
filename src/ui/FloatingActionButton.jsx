@@ -12,16 +12,18 @@ import DialogBox from "./DialogBox";
 import SearchNewUser from "../components/SearchNewUser";
 import Modal from "./Modal";
 import CreateNewGroup from "../components/CreateNewGroup";
-
+import { useNavigate } from "react-router-dom";
 function FloatingActionButton({ setOpenNotification, newNotification }) {
   console.log(newNotification, 14);
+  const navigate = useNavigate();
   const [openLogout, setOpenLogout] = React.useState(false);
   const [searchBox, setSearchBox] = React.useState(false);
   const [newGroup, setNewGroup] = React.useState(false);
   const queryClient = useQueryClient();
   const handleLogoutUser = async () => {
     await logoutUser();
-    queryClient.invalidateQueries("auth");
+    queryClient.clear();
+    navigate("/login", { replace: true });
   };
   return (
     <div className="absolute bottom-24 right-10">

@@ -10,7 +10,7 @@ import { MdOutlineLooks5 } from "react-icons/md";
 import ViewStory from "./ViewStory";
 import toast from "react-hot-toast";
 
-function ViewStatus({ setViewStatusTab, viewStatusTab }) {
+function ViewStatus({ setViewStatusTab, viewStatusTab, userData }) {
   const [openTextStory, setOpenTextStory] = useState(false);
   const [selectStatus, setSelectStatus] = useState(false);
   const [selectStatusData, setSelectStatusData] = useState(null);
@@ -104,7 +104,7 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
     setStoryData(data);
   };
   return (
-    <div className="h-full w-full bg-gray-500 z-10">
+    <div className="h-full w-full bg-gray-300 z-10">
       {/* Text Story Modal */}
       {openStory && storyData.length > 0 && (
         <Modal isOpen={openStory} onClose={() => setOpenStory(false)}>
@@ -163,7 +163,7 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
       )}
 
       {/* Header Section */}
-      <div className="w-full p-4 flex items-center h-16 border-b-2">
+      <div className="w-full shadow bg-white p-4 flex items-center h-16 border-b-2">
         <button
           type="button"
           className="absolute top-3 right-3 text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center  "
@@ -185,16 +185,16 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
             />
           </svg>
         </button>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-4 items-center">
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center relative">
-            {data?.data?.data[0]?.profile_pic && (
+            {userData?.profile_pic?.file?.path && (
               <img
-                src={data?.data?.data[0]?.profile_pic?.file?.path}
+                src={userData?.profile_pic?.file?.path}
                 alt="Profile"
                 className="w-9 h-9 rounded-full object-cover"
               />
             )}
-            {!data?.data?.data[0]?.profile_pic?.file?.path && (
+            {!userData?.profile_pic?.file?.path && (
               <div className="h-9 w-9 rounded-full object-cover bg-red-300 relative">
                 {" "}
               </div>
@@ -250,7 +250,10 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
                 </button>
               </div>
             ) : (
-              <div> Add Status</div>
+              <div className="flex flex-col">
+                <span>My Status</span>
+                <span className="text-sm">click to add status</span>
+              </div>
             )}
           </div>
           <input
@@ -266,12 +269,15 @@ function ViewStatus({ setViewStatusTab, viewStatusTab }) {
       </div>
 
       {/* Status List */}
-      <div onClick={() => setSelectStatus(false)} className="h-full p-2">
-        <ul className="gap-2 flex flex-col">
+      <div
+        onClick={() => setSelectStatus(false)}
+        className="h-full bg-gray-100 py-2"
+      >
+        <ul className="gap-2 bg-white flex flex-col">
           {chatsStatus?.data.data?.map((item) => (
             <li key={item.user_id}>
-              <div className="p-2 flex border-b-2 border-black items-center gap-3 justify-start">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+              <div className="p-2 flex shadow items-center gap-3 justify-start">
+                <div className="w-10 h-10  rounded-full flex items-center justify-center">
                   {item?.profile_pic?.file?.path && (
                     <img
                       src={item?.profile_pic?.file?.path}

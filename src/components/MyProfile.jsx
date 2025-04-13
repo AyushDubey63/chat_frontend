@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaCamera } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { updateUserDetails, fetchUserDetails } from "../services/api";
+import toast from "react-hot-toast";
 
 function MyProfile() {
   const inputRef = useRef();
@@ -26,6 +27,8 @@ function MyProfile() {
     onSuccess: (updatedData) => {
       console.log("User details updated:", updatedData);
       queryClient.invalidateQueries(["getUserDetails"]);
+      toast.success("Profile updated successfully");
+      setIsEditing(false);
     },
     onError: (error) => {
       console.error("Error updating user details:", error);

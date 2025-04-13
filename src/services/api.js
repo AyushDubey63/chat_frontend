@@ -4,8 +4,8 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const registerUserMutation = async (data) =>
   await axios.post(`${BASE_URL}/auth/register-user`, data);
 
-const fetchUserAllChats = async () =>
-  await axios.get(`${BASE_URL}/chat/get-all-chats`, {
+const fetchUserAllChats = async ({ query }) =>
+  await axios.get(`${BASE_URL}/chat/get-all-chats?search=${query}`, {
     withCredentials: true,
   });
 const fetchChatsByChatId = async ({ chat_id, page, limit = 10 }) =>

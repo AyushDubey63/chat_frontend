@@ -105,9 +105,9 @@ function LoginPage() {
               >
                 Password
               </label>
-              <div className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700  gap-2 flex justify-between">
+              <div className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:shadow-outline gap-2 flex justify-between">
                 <input
-                  className="w-full focus:outline-none focus:shadow-outline leading-tight"
+                  className="w-full focus:outline-none  leading-tight"
                   id="password"
                   type={showPassword}
                   placeholder="Password"
