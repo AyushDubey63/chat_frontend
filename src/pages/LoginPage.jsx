@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa6";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,6 +9,7 @@ import Loader from "../ui/Loader";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = React.useState("password");
   const { data, isLoading } = useQuery({
     queryKey: ["auth"],
     queryFn: authenticateUser,
@@ -49,6 +52,13 @@ function LoginPage() {
   });
   const onSubmit = (data) => {
     mutation.mutate(data);
+  };
+  const toggeleVisibilty = () => {
+    if (showPassword === "password") {
+      setShowPassword("text");
+    } else {
+      setShowPassword("password");
+    }
   };
   if (isLoading) {
     return (
@@ -95,13 +105,22 @@ function LoginPage() {
               >
                 Password
               </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
-                type="password"
-                placeholder="Password"
-                {...register("password")}
-              />
+              <div className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700  gap-2 flex justify-between">
+                <input
+                  className="w-full focus:outline-none focus:shadow-outline leading-tight"
+                  id="password"
+                  type={showPassword}
+                  placeholder="Password"
+                  {...register("password")}
+                />
+                <button type="button" onClick={() => toggeleVisibilty()}>
+                  {showPassword === "password" ? (
+                    <FaEye size={20} />
+                  ) : (
+                    <FaEyeSlash size={20} />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-red-500">{errors.password.message}</p>
               )}
