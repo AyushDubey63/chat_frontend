@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { IoIosSearch } from "react-icons/io";
-import { RiChatSmileAiFill } from "react-icons/ri";
-import { IoMdAddCircle } from "react-icons/io";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchUnreadNotificationsCount,
@@ -137,13 +134,11 @@ function LeftSideBar({ setUser }) {
         </div>
         <div className="border p-2 flex gap-2 items-center">
           <input
+            placeholder="Search"
             onChange={(e) => setSearchTerm(e.target.value)}
             type="text"
             className="w-full outline-none p-2 bg-white rounded-xl"
           />
-          <button className="bg-blue-500 text-white p-2 rounded-full">
-            <IoIosSearch size={20} />
-          </button>
         </div>
       </div>
       <ul className="max-h-[84%] overflow-y-scroll scrollbar-hidden">
