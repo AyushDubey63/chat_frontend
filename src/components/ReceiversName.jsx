@@ -19,6 +19,7 @@ function ReceiversName({ user, status, setUser, setStatus }) {
     socket.emit("video_call", {
       offer,
       chat_id: user.chat_id,
+      type: "offer",
     });
   };
 
