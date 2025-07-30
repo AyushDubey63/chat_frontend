@@ -41,7 +41,12 @@ function Chat({ user, setUser }) {
       {/* Full height of the viewport */}
       <div className="flex-shrink-0 ">
         {/* ReceiversName takes up 10% of the viewport height */}
-        <ReceiversName setUser={setUser} user={user} status={status} />
+        <ReceiversName
+          setUser={setUser}
+          user={user}
+          status={status}
+          setStatus={setStatus}
+        />
       </div>
       <div className="flex-grow overflow-y-auto h-full">
         {/* MessageBox takes up the remaining space */}
