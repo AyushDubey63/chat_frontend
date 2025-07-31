@@ -1,16 +1,16 @@
 import { useRef, useEffect } from "react";
-import { usePeer } from "../context/peer";
+import { useStream } from "../context/StreamContext";
 
 function Call() {
-  const { localStream, remoteStream } = usePeer();
+  const { myStream, remoteStream } = useStream();
   const localRef = useRef(null);
   const remoteRef = useRef(null);
-  console.log(localStream, remoteStream);
+  console.log(myStream, remoteStream);
   useEffect(() => {
-    if (localRef.current && localStream) {
-      localRef.current.srcObject = localStream;
+    if (localRef.current && myStream) {
+      localRef.current.srcObject = myStream;
     }
-  }, [localStream]);
+  }, [myStream]);
 
   useEffect(() => {
     if (remoteRef.current && remoteStream) {

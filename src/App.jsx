@@ -15,7 +15,7 @@ import ViewProfile from "./components/ViewProfile";
 import MyProfile from "./components/MyProfile";
 import ForgotPassword from "./pages/ForgotPassword";
 import SocketEventListener from "./wrappers/SocketEventListener";
-import { PeerProvider } from "./context/peer";
+import { StreamProvider } from "./context/StreamContext";
 
 const queryClient = new QueryClient();
 
@@ -23,10 +23,10 @@ const queryClient = new QueryClient();
 const ProtectedLayout = () => (
   <ProtectedRoute>
     <SocketProvider>
-      <PeerProvider>
+      <StreamProvider>
         <SocketEventListener />
         <Outlet />
-      </PeerProvider>
+      </StreamProvider>
     </SocketProvider>
   </ProtectedRoute>
 );

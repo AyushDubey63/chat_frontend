@@ -1,49 +1,41 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-const PeerContext = createContext(null);
-
-export const usePeer = () => {
-  const context = useContext(PeerContext);
-  if (!context) {
-    throw new Error("usePeer must be used within a PeerProvider");
+class PeerService {
+  constructor() {
+    if (!this.peer) {
+      this.peer = new RTCPeerConnection({
+        iceServers: [
+          {
+            urls: [
+              "stun:stun.l.google.com:19302",
+              "stun:global.stun.twilio.com:3478",
+            ],
+          },
+        ],
+      });
+    }
   }
-  return context;
-};
 
-export const PeerProvider = ({ children }) => {
-  const [peer, setPeer] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const [remoteStream, setRemoteStream] = useState(null);
-  const [inCall, setInCall] = useState(false);
-  const [chatId, setChatId] = useState(null); // optional: for ICE signaling
+  async getAnswer(offer) {
+    if (this.peer) {
+      await this.peer.setRemoteDescription(offer);
+      const ans = await this.peer.createAnswer();
+      await this.peer.setLocalDescription(new RTCSessionDescription(ans));
+      return ans;
+    }
+  }
 
-  useEffect(() => {
-    const peerInstance = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-    });
-    setPeer(peerInstance);
+  async setLocalDescription(ans) {
+    if (this.peer) {
+      await this.peer.setRemoteDescription(new RTCSessionDescription(ans));
+    }
+  }
 
-    return () => {
-      peerInstance.close();
-    };
-  }, []);
+  async getOffer() {
+    if (this.peer) {
+      const offer = await this.peer.createOffer();
+      await this.peer.setLocalDescription(new RTCSessionDescription(offer));
+      return offer;
+    }
+  }
+}
 
-  return (
-    <PeerContext.Provider
-      value={{
-        peer,
-        setPeer,
-        localStream,
-        setLocalStream,
-        remoteStream,
-        setRemoteStream,
-        inCall,
-        setInCall,
-        chatId,
-        setChatId,
-      }}
-    >
-      {children}
-    </PeerContext.Provider>
-  );
-};
+export default new PeerService();

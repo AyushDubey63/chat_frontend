@@ -3,45 +3,31 @@ import { FaVideo } from "react-icons/fa";
 import { LuArrowLeft } from "react-icons/lu";
 import ViewProfile from "./ViewProfile";
 import Modal from "../ui/Modal";
-import { usePeer } from "../context/peer";
 import { useSocket } from "../context/socket";
 import Call from "./Call";
+import peer from "../context/peer";
+import { useStream } from "../context/StreamContext";
 function ReceiversName({ user, status, setUser, setStatus }) {
-  const peer = usePeer();
   const socket = useSocket();
+  const { myStream, setMyStream, setChatId } = useStream();
   const [showCall, setShowCall] = useState(false);
   const [viewProfile, setViewProfile] = useState(false);
   console.log(user);
-  const createOffer = async () => {
-    const offer = await peer.peer.createOffer({
-      offerToReceiveAudio: true,
-      offerToReceiveVideo: true,
-    });
-    peer.peer.setLocalDescription(offer);
-    peer.setChatId(user.chat_id);
-    socket.emit("video_call", {
-      offer,
-      chat_id: user.chat_id,
-      type: "offer",
-    });
+
+  const handleCallUser = async () => {
+    let stream = myStream;
+    if (!stream) {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+    }
+    const offer = peer.getOffer();
+    setMyStream(stream);
+    setChatId(user.chat_id);
+    socket.emit("user:call", { offer, chat_id: user.chat_id });
   };
 
-  const handleCall = async () => {
-    try {
-      await createOffer();
-      setStatus("calling");
-      console.log("Call initiated");
-    } catch (error) {
-      console.error("Error initiating call:", error);
-    }
-  };
-  useEffect(() => {
-    if (peer.inCall) {
-      setShowCall(true);
-    } else {
-      setShowCall(false);
-    }
-  }, [peer.inCall]);
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
       {viewProfile && (
@@ -87,7 +73,7 @@ function ReceiversName({ user, status, setUser, setStatus }) {
       </div>
       <div className="flex items-center">
         <button className="text-white text-xs bg-blue-500 p-1 rounded-md">
-          <FaVideo onClick={handleCall} size={20} />
+          <FaVideo onClick={handleCallUser} size={20} />
         </button>
       </div>
     </div>
