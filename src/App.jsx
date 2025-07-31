@@ -21,14 +21,14 @@ const queryClient = new QueryClient();
 
 // A layout that wraps protected routes
 const ProtectedLayout = () => (
-  <SocketProvider>
-    <PeerProvider>
-      <ProtectedRoute>
+  <ProtectedRoute>
+    <SocketProvider>
+      <PeerProvider>
         <SocketEventListener />
         <Outlet />
-      </ProtectedRoute>
-    </PeerProvider>
-  </SocketProvider>
+      </PeerProvider>
+    </SocketProvider>
+  </ProtectedRoute>
 );
 
 function App() {

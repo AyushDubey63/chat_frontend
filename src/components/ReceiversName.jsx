@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaVideo } from "react-icons/fa";
 import { LuArrowLeft } from "react-icons/lu";
 import ViewProfile from "./ViewProfile";
 import Modal from "../ui/Modal";
 import { usePeer } from "../context/peer";
 import { useSocket } from "../context/socket";
+import Call from "./Call";
 function ReceiversName({ user, status, setUser, setStatus }) {
   const peer = usePeer();
   const socket = useSocket();
+  const [showCall, setShowCall] = useState(false);
   const [viewProfile, setViewProfile] = useState(false);
   console.log(user);
   const createOffer = async () => {
@@ -16,6 +18,7 @@ function ReceiversName({ user, status, setUser, setStatus }) {
       offerToReceiveVideo: true,
     });
     peer.peer.setLocalDescription(offer);
+    peer.setChatId(user.chat_id);
     socket.emit("video_call", {
       offer,
       chat_id: user.chat_id,
@@ -32,6 +35,13 @@ function ReceiversName({ user, status, setUser, setStatus }) {
       console.error("Error initiating call:", error);
     }
   };
+  useEffect(() => {
+    if (peer.inCall) {
+      setShowCall(true);
+    } else {
+      setShowCall(false);
+    }
+  }, [peer.inCall]);
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
       {viewProfile && (
@@ -43,6 +53,7 @@ function ReceiversName({ user, status, setUser, setStatus }) {
           <ViewProfile id={user.u_id} type={user.type} />
         </Modal>
       )}
+      {showCall && <Call />}
       <div className="gap-2 flex h-10 items-center rounded-full">
         {
           <div className=" block md:hidden">
