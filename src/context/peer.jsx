@@ -1,41 +1,73 @@
-class PeerService {
-  constructor() {
-    if (!this.peer) {
-      this.peer = new RTCPeerConnection({
-        iceServers: [
-          {
-            urls: [
-              "stun:stun.l.google.com:19302",
-              "stun:global.stun.twilio.com:3478",
-            ],
-          },
+const setUpPeerConnection = ({
+  peerConnectionRef,
+  socket,
+  setRemoteStream,
+}) => {
+  if (peerConnectionRef.current) {
+    console.warn("Peer connection already exists, reusing it");
+    peerConnectionRef.current.close();
+  }
+  const peer = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:global.stun.twilio.com:3478",
         ],
+      },
+    ],
+  });
+  peer.onicecandidate = (event) => {
+    if (event.candidate) {
+      console.log(
+        "ICE Candidate:",
+        event.candidate.candidate,
+        event.candidate.type
+      );
+      socket.emit("ice:candidate", {
+        candidate: event.candidate,
       });
+    } else {
+      console.log("All ICE candidates have been sent");
     }
-  }
-
-  async getAnswer(offer) {
-    if (this.peer) {
-      await this.peer.setRemoteDescription(offer);
-      const ans = await this.peer.createAnswer();
-      await this.peer.setLocalDescription(new RTCSessionDescription(ans));
-      return ans;
+  };
+  peer.onicecandidateerror = (event) => {
+    console.error("ICE Candidate Error:", event.errorText, event);
+  };
+  peer.ontrack = (event) => {
+    if (event.streams && event.streams.length > 0) {
+      console.log("Remote track received:", event.streams[0]);
+      setRemoteStream(new MediaStream(event.streams[0].getTracks()));
+    } else {
+      console.warn("No remote streams found in track event", event);
     }
-  }
+  };
+  peer.onconnectionstatechange = () => {
+    console.log("Connection state ", peer.connectionState);
+  };
 
-  async setLocalDescription(ans) {
-    if (this.peer) {
-      await this.peer.setRemoteDescription(new RTCSessionDescription(ans));
+  peer.oniceconnectionstatechange = () => {
+    console.log("ICE connection state changed:", peer.iceConnectionState);
+    if (peer.iceConnectionState === "failed") {
+      console.error("ICE connection failed, restarting ICE");
+      peer.restartIce();
     }
-  }
-
-  async getOffer() {
-    if (this.peer) {
-      const offer = await this.peer.createOffer();
-      await this.peer.setLocalDescription(new RTCSessionDescription(offer));
-      return offer;
+  };
+  socket.on("ice:candidate", (data) => {
+    if (data.candidate) {
+      console.log(
+        "ICE Candidate received:",
+        data.candidate.candidate,
+        data.candidate.type
+      );
+      peer
+        .addIceCandidate(new RTCIceCandidate(data.candidate))
+        .catch((error) => {
+          console.error("Error adding ICE candidate:", error);
+        });
     }
-  }
-}
-
-export default new PeerService();
+  });
+  peerConnectionRef.current = peer;
+  console.log("Peer connection set up successfully");
+};
+export default setUpPeerConnection;

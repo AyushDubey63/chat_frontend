@@ -3,30 +3,10 @@ import { FaVideo } from "react-icons/fa";
 import { LuArrowLeft } from "react-icons/lu";
 import ViewProfile from "./ViewProfile";
 import Modal from "../ui/Modal";
-import { useSocket } from "../context/socket";
 import Call from "./Call";
-import peer from "../context/peer";
-import { useStream } from "../context/StreamContext";
 function ReceiversName({ user, status, setUser, setStatus }) {
-  const socket = useSocket();
-  const { myStream, setMyStream, setChatId } = useStream();
   const [showCall, setShowCall] = useState(false);
   const [viewProfile, setViewProfile] = useState(false);
-  console.log(user);
-
-  const handleCallUser = async () => {
-    let stream = myStream;
-    if (!stream) {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-    }
-    const offer = peer.getOffer();
-    setMyStream(stream);
-    setChatId(user.chat_id);
-    socket.emit("user:call", { offer, chat_id: user.chat_id });
-  };
 
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
@@ -39,7 +19,11 @@ function ReceiversName({ user, status, setUser, setStatus }) {
           <ViewProfile id={user.u_id} type={user.type} />
         </Modal>
       )}
-      {showCall && <Call />}
+      {showCall && (
+        <Modal isOpen={showCall} onClose={() => setShowCall(false)}>
+          <Call user={user} />
+        </Modal>
+      )}
       <div className="gap-2 flex h-10 items-center rounded-full">
         {
           <div className=" block md:hidden">
@@ -73,7 +57,7 @@ function ReceiversName({ user, status, setUser, setStatus }) {
       </div>
       <div className="flex items-center">
         <button className="text-white text-xs bg-blue-500 p-1 rounded-md">
-          <FaVideo onClick={handleCallUser} size={20} />
+          <FaVideo onClick={() => setShowCall(true)} size={20} />
         </button>
       </div>
     </div>
