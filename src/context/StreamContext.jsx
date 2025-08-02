@@ -100,8 +100,8 @@ const StreamProvider = ({ children }) => {
             <div
               className="w-28 flex items-center justify-center bg-green-600 p-2 rounded"
               onClick={() => {
-                acceptCall(chat_id, offer);
                 setChatId(chat_id);
+                acceptCall(chat_id, offer);
                 toast.dismiss(t.id);
               }}
             >
@@ -165,13 +165,15 @@ const StreamProvider = ({ children }) => {
   const handleIceCandidate = async ({ candidate, chat_id }) => {
     console.log("ICE candidate received", candidate, chat_id);
     const currentChatId = chatId || chat_id;
-    setUpPeerConnection({
-      peerConnectionRef,
-      socket,
-      setRemoteStream,
-      chatId: currentChatId,
-      setChatId,
-    });
+    if (!peerConnectionRef.current) {
+      setUpPeerConnection({
+        peerConnectionRef,
+        socket,
+        setRemoteStream,
+        chatId: currentChatId,
+        setChatId,
+      });
+    }
     const peer = peerConnectionRef.current;
 
     if (!peer) {

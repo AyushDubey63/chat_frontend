@@ -3,7 +3,6 @@ const setUpPeerConnection = ({
   socket,
   setRemoteStream,
   chatId,
-  setChatId,
 }) => {
   if (peerConnectionRef.current) {
     console.warn("Peer connection already exists, reusing it");
