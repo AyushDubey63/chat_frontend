@@ -14,7 +14,6 @@ import CreateNewGroup from "./components/CreateNewGroup";
 import ViewProfile from "./components/ViewProfile";
 import MyProfile from "./components/MyProfile";
 import ForgotPassword from "./pages/ForgotPassword";
-import SocketEventListener from "./wrappers/SocketEventListener";
 import { StreamProvider } from "./context/StreamContext";
 
 const queryClient = new QueryClient();
@@ -24,7 +23,6 @@ const ProtectedLayout = () => (
   <ProtectedRoute>
     <SocketProvider>
       <StreamProvider>
-        <SocketEventListener />
         <Outlet />
       </StreamProvider>
     </SocketProvider>

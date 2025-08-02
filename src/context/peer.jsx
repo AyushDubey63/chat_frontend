@@ -2,6 +2,8 @@ const setUpPeerConnection = ({
   peerConnectionRef,
   socket,
   setRemoteStream,
+  chatId,
+  setChatId,
 }) => {
   if (peerConnectionRef.current) {
     console.warn("Peer connection already exists, reusing it");
@@ -9,23 +11,23 @@ const setUpPeerConnection = ({
   }
   const peer = new RTCPeerConnection({
     iceServers: [
-      {
-        urls: [
-          "stun:stun.l.google.com:19302",
-          "stun:global.stun.twilio.com:3478",
-        ],
-      },
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:19302" },
     ],
   });
   peer.onicecandidate = (event) => {
+    console.log("ICE candidate event", event, chatId);
     if (event.candidate) {
       console.log(
         "ICE Candidate:",
         event.candidate.candidate,
         event.candidate.type
       );
+      console.log(chatId, "chatId in ICE candidate");
       socket.emit("ice:candidate", {
         candidate: event.candidate,
+        chat_id: chatId,
       });
     } else {
       console.log("All ICE candidates have been sent");
@@ -53,20 +55,6 @@ const setUpPeerConnection = ({
       peer.restartIce();
     }
   };
-  socket.on("ice:candidate", (data) => {
-    if (data.candidate) {
-      console.log(
-        "ICE Candidate received:",
-        data.candidate.candidate,
-        data.candidate.type
-      );
-      peer
-        .addIceCandidate(new RTCIceCandidate(data.candidate))
-        .catch((error) => {
-          console.error("Error adding ICE candidate:", error);
-        });
-    }
-  });
   peerConnectionRef.current = peer;
   console.log("Peer connection set up successfully");
 };

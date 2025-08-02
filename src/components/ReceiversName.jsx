@@ -4,9 +4,11 @@ import { LuArrowLeft } from "react-icons/lu";
 import ViewProfile from "./ViewProfile";
 import Modal from "../ui/Modal";
 import Call from "./Call";
+import { useStream } from "../context/StreamContext";
 function ReceiversName({ user, status, setUser, setStatus }) {
-  const [showCall, setShowCall] = useState(false);
+  // const [showCall, setShowCall] = useState(false);
   const [viewProfile, setViewProfile] = useState(false);
+  const { callUser, showCall, setShowCall } = useStream();
 
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
@@ -57,7 +59,13 @@ function ReceiversName({ user, status, setUser, setStatus }) {
       </div>
       <div className="flex items-center">
         <button className="text-white text-xs bg-blue-500 p-1 rounded-md">
-          <FaVideo onClick={() => setShowCall(true)} size={20} />
+          <FaVideo
+            onClick={() => {
+              setShowCall(true);
+              callUser(user);
+            }}
+            size={20}
+          />
         </button>
       </div>
     </div>
