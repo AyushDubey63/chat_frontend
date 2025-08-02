@@ -26,7 +26,7 @@ function HomePage() {
                 height={500}
                 width={500}
                 alt=""
-                srcset=""
+                srcSet=""
               />
               <span className="text-3xl text-blue-600">
                 Chat with your freinds & family

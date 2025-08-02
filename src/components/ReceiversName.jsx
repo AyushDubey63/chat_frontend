@@ -1,36 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaVideo } from "react-icons/fa";
 import { LuArrowLeft } from "react-icons/lu";
 import ViewProfile from "./ViewProfile";
 import Modal from "../ui/Modal";
-import { usePeer } from "../context/peer";
-import { useSocket } from "../context/socket";
+import Call from "./Call";
+import { useStream } from "../context/StreamContext";
 function ReceiversName({ user, status, setUser, setStatus }) {
-  const peer = usePeer();
-  const socket = useSocket();
+  // const [showCall, setShowCall] = useState(false);
   const [viewProfile, setViewProfile] = useState(false);
-  console.log(user);
-  const createOffer = async () => {
-    const offer = await peer.peer.createOffer({
-      offerToReceiveAudio: true,
-      offerToReceiveVideo: true,
-    });
-    peer.peer.setLocalDescription(offer);
-    socket.emit("video_call", {
-      offer,
-      chat_id: user.chat_id,
-    });
-  };
+  const { callUser, showCall, setShowCall } = useStream();
 
-  const handleCall = async () => {
-    try {
-      await createOffer();
-      setStatus("calling");
-      console.log("Call initiated");
-    } catch (error) {
-      console.error("Error initiating call:", error);
-    }
-  };
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
       {viewProfile && (
@@ -40,6 +19,11 @@ function ReceiversName({ user, status, setUser, setStatus }) {
           onClose={() => setViewProfile(false)}
         >
           <ViewProfile id={user.u_id} type={user.type} />
+        </Modal>
+      )}
+      {showCall && (
+        <Modal isOpen={showCall} onClose={() => setShowCall(false)}>
+          <Call user={user} />
         </Modal>
       )}
       <div className="gap-2 flex h-10 items-center rounded-full">
@@ -75,7 +59,13 @@ function ReceiversName({ user, status, setUser, setStatus }) {
       </div>
       <div className="flex items-center">
         <button className="text-white text-xs bg-blue-500 p-1 rounded-md">
-          <FaVideo onClick={handleCall} size={20} />
+          <FaVideo
+            onClick={() => {
+              setShowCall(true);
+              callUser(user);
+            }}
+            size={20}
+          />
         </button>
       </div>
     </div>
