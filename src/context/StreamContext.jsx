@@ -175,19 +175,17 @@ const StreamProvider = ({ children }) => {
   };
 
   const handleCallDeclined = ({ chat_id }) => {
+    console.log("Call declined for chatId:", chat_id);
     if (chat_id === chatId) {
       console.log("Cleaning up call state for chatId:", chatId);
       console.log("Current myStream:", myStream);
       console.log("Current remoteStream:", remoteStream);
 
-      // Stop local stream
-      if (myStream instanceof MediaStream) {
-        stopMedia(myStream);
-        setMyStream(null);
+      if (myStream) {
+        myStream.getVideoTracks()[0]?.stop();
       }
 
-      // Remote stream is managed by the remote peer, just clear it
-      setRemoteStream(null);
+      setMyStream(null);
 
       // Close peer connection
       if (peerConnectionRef.current) {
@@ -237,7 +235,6 @@ const StreamProvider = ({ children }) => {
       console.warn("Received empty ICE candidate, skipping");
     }
   };
-
   useEffect(() => {
     if (!socket) return;
     console.log("Setting up socket listeners for chatId:", chatId);
@@ -281,6 +278,7 @@ const StreamProvider = ({ children }) => {
         setUserInCall,
         localRef,
         remoteRef,
+        handleCallDeclined,
       }}
     >
       {children}

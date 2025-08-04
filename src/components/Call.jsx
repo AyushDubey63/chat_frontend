@@ -1,11 +1,34 @@
-import { useRef, useEffect, useState } from "react";
-import { useStream } from "../context/StreamContext";
+import { useEffect, useState } from "react";
+import { DndContext } from "@dnd-kit/core";
 import toast from "react-hot-toast";
+import {
+  IoVideocamOutline,
+  IoVideocamOff,
+  IoMicOutline,
+  IoMicOffOutline,
+  IoCallOutline,
+} from "react-icons/io5";
+import { useStream } from "../context/StreamContext";
+import Draggable from "../ui/Draggable";
 
 function Call() {
-  const { myStream, remoteStream, userInCall, localRef, remoteRef } =
+  const { myStream, remoteStream, userInCall, localRef, remoteRef, endCall } =
     useStream();
   const [isCameraOff, setIsCameraOff] = useState(false);
+  const [isMicOff, setIsMicOff] = useState(false);
+
+  const toggleMic = () => {
+    setIsMicOff((prev) => {
+      const newState = !prev;
+      if (myStream) {
+        myStream.getAudioTracks().forEach((track) => {
+          track.enabled = !newState;
+        });
+      }
+      toast.success(newState ? "Mic muted" : "Mic unmuted");
+      return newState;
+    });
+  };
   const user = userInCall || {};
   // Attach local stream
   useEffect(() => {
@@ -85,51 +108,83 @@ function Call() {
   };
   console.log(myStream, remoteStream, 73);
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-white rounded-md shadow-md p-4">
-      <div className="grid grid-cols-2 gap-4 w-full">
-        <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center h-full bg-white rounded-lg shadow-lg overflow-hidden">
+      <DndContext>
+        <div className="relative w-full h-full bg-black">
           {!remoteStream && (
-            <div className="w-full h-64 flex items-center justify-center bg-gray-200 rounded">
-              <div className="rounded-full flex flex-col h-full w-full items-center justify-center">
-                <div className="w-56 h-56">
-                  <img
-                    className="w-full h-full rounded-full object-cover"
-                    src={user?.profile_pic?.file?.path}
-                  />
-                </div>
-                <h2 className="text-lg font-semibold">
-                  {user?.user_name || "Unknown"}
-                </h2>
+            <div className="w-full h-full bg-gray-200 rounded-lg flex flex-col items-center justify-center gap-4">
+              <div className="w-56 h-56 shadow-md border-4 border-white rounded-full overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={user?.profile_pic?.file?.path}
+                  alt="User profile"
+                />
               </div>
+              <h2 className="text-xl font-semibold text-gray-700">
+                {user?.user_name || "Unknown"}
+              </h2>
             </div>
           )}
-          <video
-            ref={remoteRef}
-            autoPlay
-            playsInline
-            className="w-full h-64 border rounded object-cover"
-          />
-          <button
-            onClick={handlePlayRemote}
-            className="col-span-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-          >
-            Play Remote Video
-          </button>
+
+          {remoteStream && (
+            <video
+              ref={remoteRef}
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover rounded-lg"
+            />
+          )}
+
+          <Draggable>
+            <video
+              ref={localRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-56 h-44 absolute right-5 bottom-5 border-2 border-white shadow-md rounded-lg object-cover z-20"
+            />
+          </Draggable>
+
+          <div className="absolute bottom-4 w-full flex justify-center items-center z-30">
+            <div className="flex items-center gap-3 px-5 py-3 bg-white bg-opacity-70 backdrop-blur-md rounded-full shadow-md">
+              {/* Camera Toggle */}
+              <button
+                onClick={toggleCamera}
+                className="p-2 rounded-full bg-gray-700 hover:bg-gray-800 transition-all duration-200"
+              >
+                {isCameraOff ? (
+                  <IoVideocamOutline size={22} className="text-white" />
+                ) : (
+                  <IoVideocamOff size={22} className="text-red-500" />
+                )}
+              </button>
+
+              {/* Mic Toggle */}
+              <button
+                onClick={toggleMic}
+                className="p-2 rounded-full bg-gray-700 hover:bg-gray-800 transition-all duration-200"
+              >
+                {isMicOff ? (
+                  <IoMicOffOutline size={22} className="text-white" />
+                ) : (
+                  <IoMicOutline size={22} className="text-green-400" />
+                )}
+              </button>
+
+              {/* End Call */}
+              <button
+                onClick={endCall}
+                className="p-2 rounded-full bg-red-600 hover:bg-red-700 transition-all duration-200"
+              >
+                <IoCallOutline
+                  size={22}
+                  className="text-white rotate-[135deg]"
+                />
+              </button>
+            </div>
+          </div>
         </div>
-        <video
-          ref={localRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-64 border rounded object-cover"
-        />
-        <button
-          onClick={toggleCamera}
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-        >
-          {isCameraOff ? "Turn Camera On" : "Turn Camera Off"}
-        </button>
-      </div>
+      </DndContext>
     </div>
   );
 }
