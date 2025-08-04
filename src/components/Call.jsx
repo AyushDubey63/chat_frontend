@@ -2,11 +2,10 @@ import { useRef, useEffect } from "react";
 import { useStream } from "../context/StreamContext";
 import toast from "react-hot-toast";
 
-function Call({ user }) {
-  const { myStream, remoteStream } = useStream();
-  const localRef = useRef(null);
-  const remoteRef = useRef(null);
-
+function Call() {
+  const { myStream, remoteStream, userInCall, localRef, remoteRef } =
+    useStream();
+  const user = userInCall || {};
   // Attach local stream
   useEffect(() => {
     if (localRef.current && myStream instanceof MediaStream) {

@@ -12,3 +12,11 @@ export const getLocalMedia = async () => {
     throw error;
   }
 };
+
+export const stopMedia = (stream) => {
+  if (!stream) return;
+
+  stream.getTracks().forEach((track) => {
+    track.stop();
+  });
+};

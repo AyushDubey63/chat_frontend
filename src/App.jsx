@@ -4,30 +4,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 
-import { SocketProvider } from "./context/socket";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import ProtectedRoute from "./wrappers/ProtectedRoute";
 import ViewStory from "./components/ViewStory";
 import CreateNewGroup from "./components/CreateNewGroup";
 import ViewProfile from "./components/ViewProfile";
 import MyProfile from "./components/MyProfile";
 import ForgotPassword from "./pages/ForgotPassword";
-import { StreamProvider } from "./context/StreamContext";
+import ProtectedLayout from "./layout/ProtectedLayout";
 
 const queryClient = new QueryClient();
-
-// A layout that wraps protected routes
-const ProtectedLayout = () => (
-  <ProtectedRoute>
-    <SocketProvider>
-      <StreamProvider>
-        <Outlet />
-      </StreamProvider>
-    </SocketProvider>
-  </ProtectedRoute>
-);
 
 function App() {
   return (

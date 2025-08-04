@@ -1,5 +1,5 @@
-import React from "react";
-import { Route, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { authenticateUser } from "../services/api";
 import Loader from "../ui/Loader";
@@ -11,7 +11,13 @@ const ProtectedRoute = ({ children }) => {
     queryFn: authenticateUser,
     retry: false,
   });
-  console.log(isError);
+
+  useEffect(() => {
+    if (!isLoading && (isError || !data)) {
+      navigate("/login");
+    }
+  }, [isLoading, isError, data, navigate]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full">
@@ -20,9 +26,8 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (isError || !data) {
-    navigate("/login");
-  }
+  if (isError || !data) return null;
+
   return <>{children}</>;
 };
 

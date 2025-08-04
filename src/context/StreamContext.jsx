@@ -2,16 +2,19 @@ import toast from "react-hot-toast";
 import { FiPhone, FiPhoneOff, FiUser } from "react-icons/fi";
 import { createContext, useContext, useState, useRef, useEffect } from "react";
 import { useSocket } from "./socket";
-import { getLocalMedia } from "../helper/getLocalStream";
+import { getLocalMedia, stopMedia } from "../helper/getLocalStream";
 import setUpPeerConnection from "./peer";
 
 const StreamContext = createContext();
 
 const StreamProvider = ({ children }) => {
+  const localRef = useRef(null);
+  const remoteRef = useRef(null);
   const [myStream, setMyStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
   const [chatId, setChatId] = useState();
   const [showCall, setShowCall] = useState(false);
+  const [userInCall, setUserInCall] = useState();
   const peerConnectionRef = useRef(null);
   const socket = useSocket();
 
@@ -84,8 +87,17 @@ const StreamProvider = ({ children }) => {
     setShowCall(true);
   };
 
-  const handleIncomingCall = async ({ chat_id, offer }) => {
-    toast(
+  const declineCall = ({ chat_id }) => {
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    socket.emit("call:declined", { chat_id });
+  };
+
+  const handleIncomingCall = async ({ chat_id, offer, user }) => {
+    setUserInCall(user);
+    return toast(
       (t) => (
         <div className="w-[250px] h-28 flex flex-col space-y-5">
           <div className="w-full flex gap-3 items-center">
@@ -93,7 +105,7 @@ const StreamProvider = ({ children }) => {
               <FiUser size={24} className="text-gray-600" />
             </div>
             <p className="font-medium text-sm text-black">
-              {chatId} is calling...
+              {user?.user_name} is calling...
             </p>
           </div>
           <div className="w-full flex justify-around">
@@ -110,7 +122,7 @@ const StreamProvider = ({ children }) => {
             <div
               className="w-28 flex items-center justify-center bg-red-600 p-2 rounded"
               onClick={() => {
-                // declineCall(from.id);
+                declineCall({ chat_id });
                 toast.dismiss(t.id);
               }}
             >
@@ -119,7 +131,7 @@ const StreamProvider = ({ children }) => {
           </div>
         </div>
       ),
-      { duration: Infinity }
+      { duration: 30000, onDismiss: () => {} }
     );
   };
 
@@ -160,6 +172,32 @@ const StreamProvider = ({ children }) => {
       toast.error("Failed to set up call. Please try again.");
     }
     console.log(162);
+  };
+
+  const handleCallDeclined = async ({ chat_id }) => {
+    if (chat_id === chatId) {
+      setShowCall(false);
+      setUserInCall(null);
+      stopMedia(myStream);
+      stopMedia(remoteStream);
+      peerConnectionRef.current?.close();
+      peerConnectionRef.current = null;
+      if (localRef) {
+        localRef.current.srcObject = null;
+        localRef.current.pause();
+        localRef.current.removeAttribute("src");
+      }
+      if (remoteRef) {
+        remoteRef.current.srcObject = null;
+        remoteRef.current.pause();
+        remoteRef.current.removeAttribute("src");
+      }
+      setTimeout(() => {
+        setMyStream(null);
+        setRemoteStream(null);
+        toast.error("Call declined by the other user.");
+      }, 500);
+    }
   };
 
   const handleIceCandidate = async ({ candidate, chat_id }) => {
@@ -210,6 +248,9 @@ const StreamProvider = ({ children }) => {
       console.log("Received call:accepted for chatId:", data.chat_id);
       handleCallAccepted(data);
     });
+    socket.on("call:declined", (data) => {
+      handleCallDeclined(data);
+    });
     return () => {
       console.log("Cleaning up socket listeners for chatId:", chatId);
       socket.off("ice:candidate");
@@ -231,6 +272,10 @@ const StreamProvider = ({ children }) => {
         acceptCall,
         showCall,
         setShowCall,
+        userInCall,
+        setUserInCall,
+        localRef,
+        remoteRef,
       }}
     >
       {children}

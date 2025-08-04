@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaVideo } from "react-icons/fa";
 import { LuArrowLeft } from "react-icons/lu";
 import ViewProfile from "./ViewProfile";
 import Modal from "../ui/Modal";
-import Call from "./Call";
 import { useStream } from "../context/StreamContext";
-function ReceiversName({ user, status, setUser, setStatus }) {
-  // const [showCall, setShowCall] = useState(false);
+function ReceiversName({ user, status, setUser }) {
   const [viewProfile, setViewProfile] = useState(false);
-  const { callUser, showCall, setShowCall } = useStream();
+  const { callUser, setShowCall, setUserInCall } = useStream();
 
   return (
     <div className="px-5 w-full h-full bg-blue-400 flex justify-between items-center p-2">
@@ -19,11 +17,6 @@ function ReceiversName({ user, status, setUser, setStatus }) {
           onClose={() => setViewProfile(false)}
         >
           <ViewProfile id={user.u_id} type={user.type} />
-        </Modal>
-      )}
-      {showCall && (
-        <Modal isOpen={showCall} onClose={() => setShowCall(false)}>
-          <Call user={user} />
         </Modal>
       )}
       <div className="gap-2 flex h-10 items-center rounded-full">
@@ -62,6 +55,7 @@ function ReceiversName({ user, status, setUser, setStatus }) {
           <FaVideo
             onClick={() => {
               setShowCall(true);
+              setUserInCall(user);
               callUser(user);
             }}
             size={20}
