@@ -174,29 +174,34 @@ const StreamProvider = ({ children }) => {
     console.log(162);
   };
 
-  const handleCallDeclined = async ({ chat_id }) => {
+  const handleCallDeclined = ({ chat_id }) => {
     if (chat_id === chatId) {
+      console.log("Cleaning up call state for chatId:", chatId);
+      console.log("Current myStream:", myStream);
+      console.log("Current remoteStream:", remoteStream);
+
+      // Stop local stream
+      if (myStream instanceof MediaStream) {
+        stopMedia(myStream);
+        setMyStream(null);
+      }
+
+      // Remote stream is managed by the remote peer, just clear it
+      setRemoteStream(null);
+
+      // Close peer connection
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+        peerConnectionRef.current = null;
+        console.log("Peer connection closed");
+      }
+
+      // Update UI states
       setShowCall(false);
       setUserInCall(null);
-      stopMedia(myStream);
-      stopMedia(remoteStream);
-      peerConnectionRef.current?.close();
-      peerConnectionRef.current = null;
-      if (localRef) {
-        localRef.current.srcObject = null;
-        localRef.current.pause();
-        localRef.current.removeAttribute("src");
-      }
-      if (remoteRef) {
-        remoteRef.current.srcObject = null;
-        remoteRef.current.pause();
-        remoteRef.current.removeAttribute("src");
-      }
-      setTimeout(() => {
-        setMyStream(null);
-        setRemoteStream(null);
-        toast.error("Call declined by the other user.");
-      }, 500);
+      setChatId(null);
+
+      toast.error("Call declined by the other user.");
     }
   };
 

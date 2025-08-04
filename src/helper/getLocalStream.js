@@ -14,9 +14,17 @@ export const getLocalMedia = async () => {
 };
 
 export const stopMedia = (stream) => {
-  if (!stream) return;
-
-  stream.getTracks().forEach((track) => {
-    track.stop();
-  });
+  if (stream instanceof MediaStream) {
+    stream.getTracks().forEach((track) => {
+      console.log(`Stopping track ${track.kind}:`, {
+        enabled: track.enabled,
+        readyState: track.readyState,
+      });
+      track.stop();
+      track.enabled = false;
+    });
+    console.log("All tracks stopped for stream:", stream.id);
+  } else {
+    console.warn("No valid stream to stop");
+  }
 };
