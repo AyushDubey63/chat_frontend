@@ -235,6 +235,38 @@ const StreamProvider = ({ children }) => {
       console.warn("Received empty ICE candidate, skipping");
     }
   };
+
+  const endCall = ({ isIncoming = false }) => {
+    console.log(isIncoming);
+    console.log("Ending call for chatId:", chatId);
+    if (isIncoming) {
+      const toastId = toast.error("Call Disconnected.");
+      setTimeout(() => {
+        toast.dismiss(toastId);
+      }, 3000);
+    } else {
+      console.log("Emitting call:ended for chatId:", chatId);
+      socket.emit("call:ended", { chat_id: chatId });
+      const toastId = toast.success("Call ended.");
+      setTimeout(() => {
+        toast.dismiss(toastId);
+      }, 3000);
+    }
+    peerConnectionRef.current?.close();
+    peerConnectionRef.current = null;
+
+    stopMedia(myStream);
+    stopMedia(remoteStream);
+    setTimeout(() => {
+      setMyStream(null);
+      setRemoteStream(null);
+    }, 300);
+
+    setShowCall(false);
+    setUserInCall(null);
+    setChatId(null);
+  };
+
   useEffect(() => {
     if (!socket) return;
     console.log("Setting up socket listeners for chatId:", chatId);
@@ -252,6 +284,10 @@ const StreamProvider = ({ children }) => {
     });
     socket.on("call:declined", (data) => {
       handleCallDeclined(data);
+    });
+    socket.on("call:ended", () => {
+      console.log("Received call:ended for chatId:", chatId);
+      endCall({ isIncoming: true });
     });
     return () => {
       console.log("Cleaning up socket listeners for chatId:", chatId);
@@ -279,6 +315,7 @@ const StreamProvider = ({ children }) => {
         localRef,
         remoteRef,
         handleCallDeclined,
+        endCall,
       }}
     >
       {children}

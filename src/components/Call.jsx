@@ -35,64 +35,32 @@ function Call() {
       localRef.current.srcObject = myStream;
       localRef.current.play().catch((error) => {
         console.error("Error playing local video:", error);
-        toast.error("Failed to play local video.");
+        const toastId = toast.error("Failed to play local video.");
+        setTimeout(() => {
+          toast.dismiss(toastId);
+        }, 2000);
       });
     }
   }, [myStream]);
 
   // Attach remote stream
   useEffect(() => {
-    if (remoteRef.current && remoteStream instanceof MediaStream) {
-      remoteRef.current.srcObject = remoteStream;
-      console.log("Remote stream assigned to video element");
-      console.log("Remote stream tracks:", remoteStream.getTracks());
-      console.log("Remote video tracks:", remoteStream.getVideoTracks());
-      remoteStream.getTracks().forEach((track) => {
-        console.log(`Track ${track.kind}:`, {
-          enabled: track.enabled,
-          readyState: track.readyState,
-          muted: track.muted,
-        });
+    const video = remoteRef.current;
+    if (!video) return;
+    if (!(remoteStream instanceof MediaStream)) return;
+
+    // ⛔ Prevent resetting the same stream
+    if (video.srcObject === remoteStream) return;
+
+    video.srcObject = remoteStream;
+
+    video.onloadedmetadata = () => {
+      video.play().catch((err) => {
+        console.error("Remote video play failed:", err);
       });
-      remoteRef.current.play().catch((error) => {
-        console.error("Error playing remote video:", error.name, error.message);
-        toast.error(`Failed to play remote video: ${error.message}`);
-      });
-      // Listen for video element events
-      remoteRef.current.onloadedmetadata = () => {
-        console.log("Remote video metadata loaded:", {
-          videoWidth: remoteRef.current.videoWidth,
-          videoHeight: remoteRef.current.videoHeight,
-        });
-      };
-      remoteRef.current.onplay = () => {
-        console.log("Remote video is playing");
-      };
-      remoteRef.current.onpause = () => {
-        console.warn("Remote video is paused");
-      };
-    } else {
-      console.warn("Invalid remote stream or video ref", {
-        remoteStream,
-        remoteRef: !!remoteRef.current,
-      });
-    }
+    };
   }, [remoteStream]);
 
-  // Handle manual play
-  const handlePlayRemote = () => {
-    if (remoteRef.current && remoteRef.current.srcObject) {
-      remoteRef.current.play().catch((error) => {
-        console.error("Error playing remote video:", error);
-        toast.error("Failed to play remote video. Please try again.");
-      });
-      console.log("Playing remote video");
-      console.log("Remote video element:", remoteRef.current);
-    } else {
-      console.warn("No remote stream to play");
-      toast.error("No remote video stream available.");
-    }
-  };
   const toggleCamera = () => {
     setIsCameraOff((prev) => {
       const newState = !prev;
@@ -110,8 +78,7 @@ function Call() {
     <div className="flex flex-col items-center justify-center h-full bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="w-full h-full relative bg-black" ref={containerRef}>
         {!remoteStream && (
-          <div className="w-full h-full bg-gray-200 rounded-lg flex flex-col items-center justify-center gap-4">
-            {/* Profile Placeholder */}
+          <div className="absolute inset-0 bg-gray-200 rounded-lg flex flex-col items-center justify-center gap-4 z-10">
             <div className="w-56 h-56 shadow-md border-4 border-white rounded-full overflow-hidden">
               <img
                 className="w-full h-full object-cover"
@@ -125,14 +92,14 @@ function Call() {
           </div>
         )}
 
-        {remoteStream && (
-          <video
-            ref={remoteRef}
-            autoPlay
-            playsInline
-            className="w-full h-full object-cover rounded-lg"
-          />
-        )}
+        <video
+          ref={remoteRef}
+          autoPlay
+          playsInline
+          className={`w-full h-full object-cover rounded-lg ${
+            remoteStream ? "block" : "hidden"
+          }`}
+        />
 
         {/* Controls */}
         <div className="absolute bottom-4 w-full flex justify-center items-center z-30">
@@ -158,7 +125,7 @@ function Call() {
               )}
             </button>
             <button
-              onClick={endCall}
+              onClick={() => endCall({ isIncoming: false })}
               className="p-2 rounded-full bg-red-600 hover:bg-red-700 transition-all duration-200"
             >
               <IoCallOutline size={22} className="text-white rotate-[135deg]" />
